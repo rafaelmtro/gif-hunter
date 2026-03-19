@@ -77,14 +77,12 @@ This project strictly follows a feature-branch workflow to maintain a stable cod
 ### Docker Usage (Recommended Dev Environment)
 For the most consistent dev environment, the application should be built within a Docker container and exposed to `localhost`.
 - **Base Image:** The project strictly uses `ghcr.io/cirruslabs/flutter:stable` to ensure a reliable and up-to-date Flutter build environment.
-
 **Building and Running the Container:**
 ```bash
 # Build the development image
 docker build -t gif-hunter-dev .
 
 # Run the container, mapping the port and volume
+# The application will automatically start on port 8080
 docker run -p 8080:8080 -v $(pwd):/app -it gif-hunter-dev
-
-# Note: Ensure the Flutter web server binds to 0.0.0.0 inside the container:
-# flutter run -d web-server --web-hostname 0.0.0.0 --web-port 8080
+```

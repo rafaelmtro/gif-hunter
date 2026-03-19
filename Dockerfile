@@ -1,30 +1,16 @@
-FROM debian:bullseye-slim
+FROM ghcr.io/cirruslabs/flutter:stable
 
-# Flutter dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    file \
-    unzip \
-    xz-utils
+# Set the working directory
+WORKDIR /app
 
-# Add developer user
-RUN useradd -ms /bin/bash developer
-USER developer
+# Copy the project files
+COPY . .
 
-# Install Flutter
-RUN git clone https://github.com/flutter/flutter.git $HOME/flutter
+# Ensure dependencies are fetched
+RUN flutter pub get
 
-# Add flutter tool to PATH
-ENV PATH /home/developer/flutter/bin:$PATH
+# Expose the web server port
+EXPOSE 8080
 
-# Display installation status
-RUN flutter doctor
-
-# Enable flutter WEB
-RUN flutter upgrade
-RUN flutter config --enable-web
-
-# Copy files to container
-WORKDIR $HOME/app
-COPY ./ ./
+# Start the Flutter web server binding to 0.0.0.0 to allow external access
+CMD ["flutter", "run", "-d", "web-server", "--web-hostname", "0.0.0.0", "--web-port", "8080"]
