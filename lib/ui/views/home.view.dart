@@ -12,16 +12,17 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   final _textEditCtrl = TextEditingController();
-  String _search;
+  String? _search;
   int _offset = 0;
 
   _getGigs() async {
     Response response;
-    if (_search == null || _search.isEmpty) {
+    final search = _search;
+    if (search == null || search.isEmpty) {
       response = await Dio().get('https://api.giphy.com/v1/gifs/trending?api_key=nFpRCivJ74jdZjHMPgp2qsKDobPWhE4e&limit=20&rating=g');
     } else {
       response = await Dio()
-          .get('https://api.giphy.com/v1/gifs/search?api_key=nFpRCivJ74jdZjHMPgp2qsKDobPWhE4e&q=$_search &limit=19&offset=$_offset&rating=g&lang=en');
+          .get('https://api.giphy.com/v1/gifs/search?api_key=nFpRCivJ74jdZjHMPgp2qsKDobPWhE4e&q=$search &limit=19&offset=$_offset&rating=g&lang=en');
     }
     return response.data;
   }
