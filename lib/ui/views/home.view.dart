@@ -15,38 +15,76 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   final _textEditCtrl = TextEditingController();
   final _giphyService = GiphyService();
+  final _scrollController = ScrollController();
+  
   String? _search;
   int _offset = 0;
   Timer? _debounce;
+  
+  List<dynamic> _gifs = [];
+  bool _loading = false;
+  Future? _future;
 
-  _getGigs() async {
+  @override
+  void initState() {
+    super.initState();
+    _future = _getGigs();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent * 0.8) {
+        if (!_loading) {
+          _loadMore();
+        }
+      }
+    });
+  }
+
+  Future _getGigs() async {
+    _loading = true;
     final search = _search;
+    Map<String, dynamic> data;
     if (search == null || search.isEmpty) {
-      return _giphyService.getTrending(limit: 20);
+      data = await _giphyService.getTrending(limit: 20);
     } else {
-      return _giphyService.searchGifs(
+      data = await _giphyService.searchGifs(
         query: search,
-        limit: 19,
+        limit: 20,
         offset: _offset,
       );
     }
+    _gifs.addAll(data['data']);
+    _loading = false;
+    return _gifs;
+  }
+
+  void _loadMore() {
+    setState(() {
+      _offset += 20;
+      _future = _getGigs();
+    });
+  }
+
+  void _onSearchChanged(String text) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      _resetSearch(text);
+    });
+  }
+
+  void _resetSearch(String text) {
+    setState(() {
+      _search = text;
+      _offset = 0;
+      _gifs = [];
+      _future = _getGigs();
+    });
   }
 
   @override
   void dispose() {
     _debounce?.cancel();
     _textEditCtrl.dispose();
+    _scrollController.dispose();
     super.dispose();
-  }
-
-  void _onSearchChanged(String text) {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () {
-      setState(() {
-        _search = text;
-        _offset = 0;
-      });
-    });
   }
 
   @override
@@ -72,10 +110,7 @@ class _HomeViewState extends State<HomeView> {
                 onChanged: _onSearchChanged,
                 onSubmitted: (text) {
                   _debounce?.cancel();
-                  setState(() {
-                    _search = text;
-                    _offset = 0;
-                  });
+                  _resetSearch(text);
                 },
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -97,17 +132,21 @@ class _HomeViewState extends State<HomeView> {
             ),
             Expanded(
               child: FutureBuilder(
-                future: _getGigs(),
+                future: _future,
                 builder: (context, AsyncSnapshot snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
+                      if (_gifs.isEmpty) {
+                        return _buildSkeletonGrid();
+                      }
+                      return _createGigTable(context, _gifs);
                     case ConnectionState.none:
                       return _buildSkeletonGrid();
                     default:
                       if (snapshot.hasError) {
                         return Container();
                       } else {
-                        return _createGigTable(context, snapshot);
+                        return _createGigTable(context, _gifs);
                       }
                   }
                 },
@@ -132,74 +171,38 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  int _getCount(List data) {
-    if (_search == null) {
-      return data.length;
-    } else {
-      return data.length + 1;
-    }
-  }
-
-  Widget _createGigTable(BuildContext context, AsyncSnapshot snapshot) {
+  Widget _createGigTable(BuildContext context, List data) {
     return GridView.builder(
+      controller: _scrollController,
       padding: EdgeInsets.all(10.0),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 6,
         crossAxisSpacing: 8.0,
         mainAxisSpacing: 8.0,
       ),
-      itemCount: _getCount(snapshot.data['data']),
+      itemCount: data.length,
       itemBuilder: (context, index) {
-        if (_search == null || index < snapshot.data['data'].length) {
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return GifView(snapshot.data['data'][index]);
-                  },
-                ),
-              );
-            },
-            onLongPress: () {
-              Share.share(snapshot.data['data'][index]['images']['fixed_height']['url']);
-            },
-            child: FadeInImage.memoryNetwork(
-              placeholder: kTransparentImage,
-              image: snapshot.data['data'][index]['images']['fixed_height']['url'],
-              height: 300.0,
-              fit: BoxFit.cover,
-            ),
-          );
-        } else {
-          return Container(
-            child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  _offset += 19;
-                });
-              },
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.add,
-                    color: Colors.white,
-                    size: 70.0,
-                  ),
-                  Text(
-                    'Load more...',
-                    style: TextStyle(
-                      fontSize: 22.0,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return GifView(data[index]);
+                },
               ),
-            ),
-          );
-        }
+            );
+          },
+          onLongPress: () {
+            Share.share(data[index]['images']['fixed_height']['url']);
+          },
+          child: FadeInImage.memoryNetwork(
+            placeholder: kTransparentImage,
+            image: data[index]['images']['fixed_height']['url'],
+            height: 300.0,
+            fit: BoxFit.cover,
+          ),
+        );
       },
     );
   }

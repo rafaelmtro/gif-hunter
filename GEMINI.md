@@ -45,6 +45,7 @@ The project follows a standard but strictly organized Flutter directory structur
     - Interactive elements with clear feedback (e.g., hover states, loading indicators).
     - **Debounced "Search-as-you-type":** Instantaneous and fluid search that automatically triggers API fetch after 500ms of user inactivity.
     - **Skeleton Loading States:** Custom shimmer effect in the high-density grid provides better visual feedback that content is specifically "loading" rather than just "missing".
+    - **Infinite Scroll with Smart Pre-fetching:** Automatically fetches the next set of results when the user is 80% down the current list, creating an "endless" browsing experience.
 
 ---
 
