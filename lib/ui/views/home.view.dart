@@ -102,15 +102,7 @@ class _HomeViewState extends State<HomeView> {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
                     case ConnectionState.none:
-                      return Container(
-                        height: 200.0,
-                        width: 200.0,
-                        alignment: Alignment.center,
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          strokeWidth: 5.0,
-                        ),
-                      );
+                      return _buildSkeletonGrid();
                     default:
                       if (snapshot.hasError) {
                         return Container();
@@ -124,6 +116,19 @@ class _HomeViewState extends State<HomeView> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSkeletonGrid() {
+    return GridView.builder(
+      padding: EdgeInsets.all(10.0),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 6,
+        crossAxisSpacing: 8.0,
+        mainAxisSpacing: 8.0,
+      ),
+      itemCount: 20,
+      itemBuilder: (context, index) => SkeletonLoading(),
     );
   }
 
@@ -196,6 +201,47 @@ class _HomeViewState extends State<HomeView> {
           );
         }
       },
+    );
+  }
+}
+
+class SkeletonLoading extends StatefulWidget {
+  @override
+  _SkeletonLoadingState createState() => _SkeletonLoadingState();
+}
+
+class _SkeletonLoadingState extends State<SkeletonLoading> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat(reverse: true);
+    _animation = Tween<double>(begin: 0.4, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _animation,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(4.0),
+        ),
+      ),
     );
   }
 }

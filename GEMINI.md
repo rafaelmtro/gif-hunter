@@ -44,6 +44,7 @@ The project follows a standard but strictly organized Flutter directory structur
     - Smooth image loading transitions to prevent layout shifts.
     - Interactive elements with clear feedback (e.g., hover states, loading indicators).
     - **Debounced "Search-as-you-type":** Instantaneous and fluid search that automatically triggers API fetch after 500ms of user inactivity.
+    - **Skeleton Loading States:** Custom shimmer effect in the high-density grid provides better visual feedback that content is specifically "loading" rather than just "missing".
 
 ---
 
