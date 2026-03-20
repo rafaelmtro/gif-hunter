@@ -4,6 +4,7 @@ import '../services/giphy.service.dart';
 class GifsState {
   final List<dynamic> gifs;
   final String search;
+  final String? selectedTag;
   final int offset;
   final bool isLoading;
   final bool isInitialLoading;
@@ -11,6 +12,7 @@ class GifsState {
   GifsState({
     this.gifs = const [],
     this.search = '',
+    this.selectedTag,
     this.offset = 0,
     this.isLoading = false,
     this.isInitialLoading = true,
@@ -19,6 +21,7 @@ class GifsState {
   GifsState copyWith({
     List<dynamic>? gifs,
     String? search,
+    String? selectedTag,
     int? offset,
     bool? isLoading,
     bool? isInitialLoading,
@@ -26,6 +29,7 @@ class GifsState {
     return GifsState(
       gifs: gifs ?? this.gifs,
       search: search ?? this.search,
+      selectedTag: selectedTag ?? this.selectedTag,
       offset: offset ?? this.offset,
       isLoading: isLoading ?? this.isLoading,
       isInitialLoading: isInitialLoading ?? this.isInitialLoading,
@@ -68,10 +72,10 @@ class GifsNotifier extends StateNotifier<GifsState> {
     }
   }
 
-  void updateSearch(String query) {
-    if (state.search == query) return;
+  void updateSearch(String query, {String? tag}) {
+    if (state.search == query && state.selectedTag == tag) return;
     
-    state = GifsState(search: query, isInitialLoading: true);
+    state = GifsState(search: query, selectedTag: tag, isInitialLoading: true);
     fetchGifs();
   }
 

@@ -38,7 +38,12 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
   void _onTagSelected(String tag) {
     _textEditCtrl.text = tag;
-    ref.read(gifsProvider.notifier).updateSearch(tag);
+    ref.read(gifsProvider.notifier).updateSearch(tag, tag: tag);
+  }
+
+  void _onTagDeselected() {
+    _textEditCtrl.clear();
+    ref.read(gifsProvider.notifier).updateSearch('');
   }
 
   @override
@@ -58,7 +63,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
       backgroundColor: Colors.black,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.only(left: 40.0, right: 100.0),
+          padding: const EdgeInsets.only(left: 40.0, right: 40.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -81,67 +86,38 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   const SizedBox(width: 20.0),
                   Expanded(
                     flex: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextField(
-                          controller: _textEditCtrl,
-                          onChanged: _onSearchChanged,
-                          onSubmitted: (text) {
-                            _debounce?.cancel();
-                            ref.read(gifsProvider.notifier).updateSearch(text);
-                          },
-                          textAlign: TextAlign.left,
-                          maxLines: null,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16.0,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: 'Search here',
-                            hintStyle: const TextStyle(color: Colors.grey),
-                            filled: true,
-                            fillColor: const Color(0xff1A1A1A),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                              borderSide: BorderSide.none,
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                              borderSide: BorderSide.none,
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                              borderSide: const BorderSide(color: Colors.orange, width: 1.0),
-                            ),
-                          ),
+                    child: TextField(
+                      controller: _textEditCtrl,
+                      onChanged: _onSearchChanged,
+                      onSubmitted: (text) {
+                        _debounce?.cancel();
+                        ref.read(gifsProvider.notifier).updateSearch(text);
+                      },
+                      textAlign: TextAlign.left,
+                      maxLines: null,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16.0,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Search here',
+                        hintStyle: const TextStyle(color: Colors.grey),
+                        filled: true,
+                        fillColor: const Color(0xff1A1A1A),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          borderSide: BorderSide.none,
                         ),
-                        const SizedBox(height: 12.0),
-                        trendingTagsAsync.when(
-                          data: (tags) => SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: tags.map((tag) => Padding(
-                                padding: const EdgeInsets.only(right: 8.0),
-                                child: ActionChip(
-                                  label: Text(
-                                    '#$tag',
-                                    style: const TextStyle(color: Colors.white, fontSize: 12.0),
-                                  ),
-                                  backgroundColor: const Color(0xff1A1A1A),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20.0),
-                                  ),
-                                  onPressed: () => _onTagSelected(tag),
-                                ),
-                              )).toList(),
-                            ),
-                          ),
-                          loading: () => const SizedBox(height: 32.0),
-                          error: (_, __) => const SizedBox.shrink(),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          borderSide: BorderSide.none,
                         ),
-                      ],
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          borderSide: const BorderSide(color: Colors.orange, width: 1.0),
+                        ),
+                      ),
                     ),
                   ),
                   const Spacer(flex: 1),
@@ -150,12 +126,76 @@ class _HomeViewState extends ConsumerState<HomeView> {
               const SizedBox(height: 20.0),
               Expanded(
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(width: 170.0), // Space matching the name + gap
                     Expanded(
+                      flex: 4,
                       child: state.isInitialLoading 
                         ? _buildSkeletonGrid()
                         : _createGigTable(context, state.gifs),
+                    ),
+                    const SizedBox(width: 40.0),
+                    // Dedicated Trending Tags Sidebar
+                    SizedBox(
+                      width: 200.0,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 10.0),
+                            child: Text(
+                              'Trending Tags',
+                              style: TextStyle(
+                                color: Colors.orange,
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: trendingTagsAsync.when(
+                              data: (tags) => ListView.builder(
+                                itemCount: tags.length,
+                                itemBuilder: (context, index) {
+                                  final tag = tags[index];
+                                  final isSelected = state.selectedTag == tag;
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 8.0),
+                                    child: ActionChip(
+                                      label: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            '#$tag',
+                                            style: TextStyle(
+                                              color: isSelected ? Colors.black : Colors.white,
+                                              fontSize: 13.0,
+                                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                            ),
+                                          ),
+                                          if (isSelected)
+                                            const Padding(
+                                              padding: EdgeInsets.only(left: 4.0),
+                                              child: Icon(Icons.close, size: 14.0, color: Colors.black),
+                                            ),
+                                        ],
+                                      ),
+                                      backgroundColor: isSelected ? Colors.orange : const Color(0xff1A1A1A),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20.0),
+                                      ),
+                                      onPressed: () => isSelected ? _onTagDeselected() : _onTagSelected(tag),
+                                    ),
+                                  );
+                                },
+                              ),
+                              loading: () => const Center(child: CircularProgressIndicator(color: Colors.orange)),
+                              error: (_, __) => const SizedBox.shrink(),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
