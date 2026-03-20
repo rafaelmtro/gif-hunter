@@ -4,7 +4,7 @@ import '../services/giphy.service.dart';
 class GifsState {
   final List<dynamic> gifs;
   final String search;
-  final String? selectedTag;
+  final Set<String> selectedTags;
   final int offset;
   final bool isLoading;
   final bool isInitialLoading;
@@ -12,7 +12,7 @@ class GifsState {
   GifsState({
     this.gifs = const [],
     this.search = '',
-    this.selectedTag,
+    this.selectedTags = const {},
     this.offset = 0,
     this.isLoading = false,
     this.isInitialLoading = true,
@@ -21,7 +21,7 @@ class GifsState {
   GifsState copyWith({
     List<dynamic>? gifs,
     String? search,
-    String? selectedTag,
+    Set<String>? selectedTags,
     int? offset,
     bool? isLoading,
     bool? isInitialLoading,
@@ -29,7 +29,7 @@ class GifsState {
     return GifsState(
       gifs: gifs ?? this.gifs,
       search: search ?? this.search,
-      selectedTag: selectedTag ?? this.selectedTag,
+      selectedTags: selectedTags ?? this.selectedTags,
       offset: offset ?? this.offset,
       isLoading: isLoading ?? this.isLoading,
       isInitialLoading: isInitialLoading ?? this.isInitialLoading,
@@ -51,11 +51,18 @@ class GifsNotifier extends StateNotifier<GifsState> {
     
     try {
       final Map<String, dynamic> data;
-      if (state.search.isEmpty) {
+      // Combine manual search with tags
+      String finalQuery = state.search;
+      if (state.selectedTags.isNotEmpty) {
+        final tagsQuery = state.selectedTags.join(' ');
+        finalQuery = finalQuery.isEmpty ? tagsQuery : '$finalQuery $tagsQuery';
+      }
+
+      if (finalQuery.isEmpty) {
         data = await _giphyService.getTrending(limit: 20);
       } else {
         data = await _giphyService.searchGifs(
-          query: state.search,
+          query: finalQuery,
           limit: 20,
           offset: state.offset,
         );
@@ -72,10 +79,27 @@ class GifsNotifier extends StateNotifier<GifsState> {
     }
   }
 
-  void updateSearch(String query, {String? tag}) {
-    if (state.search == query && state.selectedTag == tag) return;
+  void updateSearch(String query) {
+    if (state.search == query) return;
     
-    state = GifsState(search: query, selectedTag: tag, isInitialLoading: true);
+    // Clear tags when user starts typing a new manual search
+    state = GifsState(search: query, selectedTags: {}, isInitialLoading: true);
+    fetchGifs();
+  }
+
+  void toggleTag(String tag) {
+    final newTags = Set<String>.from(state.selectedTags);
+    if (newTags.contains(tag)) {
+      newTags.remove(tag);
+    } else {
+      newTags.add(tag);
+    }
+    
+    state = GifsState(
+      search: state.search,
+      selectedTags: newTags,
+      isInitialLoading: true,
+    );
     fetchGifs();
   }
 

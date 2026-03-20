@@ -36,14 +36,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
     });
   }
 
-  void _onTagSelected(String tag) {
-    _textEditCtrl.text = tag;
-    ref.read(gifsProvider.notifier).updateSearch(tag, tag: tag);
-  }
-
-  void _onTagDeselected() {
-    _textEditCtrl.clear();
-    ref.read(gifsProvider.notifier).updateSearch('');
+  void _onTagToggled(String tag) {
+    ref.read(gifsProvider.notifier).toggleTag(tag);
   }
 
   @override
@@ -58,6 +52,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
   Widget build(BuildContext context) {
     final state = ref.watch(gifsProvider);
     final trendingTagsAsync = ref.watch(trendingTagsProvider);
+
+    // Sync controller with state (clearing it when state search is cleared)
+    if (state.search.isEmpty && _textEditCtrl.text.isNotEmpty) {
+      _textEditCtrl.clear();
+    }
     
     return Scaffold(
       backgroundColor: Colors.black,
@@ -138,7 +137,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                     const SizedBox(width: 40.0),
                     // Dedicated Trending Tags Sidebar
                     SizedBox(
-                      width: 200.0,
+                      width: 220.0,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -155,40 +154,37 @@ class _HomeViewState extends ConsumerState<HomeView> {
                           ),
                           Expanded(
                             child: trendingTagsAsync.when(
-                              data: (tags) => ListView.builder(
-                                itemCount: tags.length,
-                                itemBuilder: (context, index) {
-                                  final tag = tags[index];
-                                  final isSelected = state.selectedTag == tag;
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 8.0),
-                                    child: ActionChip(
-                                      label: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
+                              data: (tags) => SingleChildScrollView(
+                                child: Container(
+                                  padding: const EdgeInsets.all(12.0),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xff1A1A1A),
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                  child: Wrap(
+                                    spacing: 8.0,
+                                    runSpacing: 4.0,
+                                    children: tags.map((tag) {
+                                      final isSelected = state.selectedTags.contains(tag);
+                                      return InkWell(
+                                        onTap: () => _onTagToggled(tag),
+                                        borderRadius: BorderRadius.circular(4.0),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
+                                          child: Text(
                                             '#$tag',
                                             style: TextStyle(
-                                              color: isSelected ? Colors.black : Colors.white,
-                                              fontSize: 13.0,
+                                              color: isSelected ? Colors.orange : Colors.white70,
+                                              fontSize: 14.0,
                                               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                              decoration: isSelected ? TextDecoration.underline : TextDecoration.none,
                                             ),
                                           ),
-                                          if (isSelected)
-                                            const Padding(
-                                              padding: EdgeInsets.only(left: 4.0),
-                                              child: Icon(Icons.close, size: 14.0, color: Colors.black),
-                                            ),
-                                        ],
-                                      ),
-                                      backgroundColor: isSelected ? Colors.orange : const Color(0xff1A1A1A),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(20.0),
-                                      ),
-                                      onPressed: () => isSelected ? _onTagDeselected() : _onTagSelected(tag),
-                                    ),
-                                  );
-                                },
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
                               ),
                               loading: () => const Center(child: CircularProgressIndicator(color: Colors.orange)),
                               error: (_, __) => const SizedBox.shrink(),
