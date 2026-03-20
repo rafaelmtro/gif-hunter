@@ -2,81 +2,37 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share/share.dart';
 import 'package:transparent_image/transparent_image.dart';
 
-import '../../services/giphy.service.dart';
+import '../../providers/giphy_notifier.dart';
 import 'gif.view.dart';
 
-class HomeView extends StatefulWidget {
+class HomeView extends ConsumerStatefulWidget {
   @override
   _HomeViewState createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class _HomeViewState extends ConsumerState<HomeView> {
   final _textEditCtrl = TextEditingController();
-  final _giphyService = GiphyService();
   final _scrollController = ScrollController();
-  
-  String? _search;
-  int _offset = 0;
   Timer? _debounce;
-  
-  List<dynamic> _gifs = [];
-  bool _loading = false;
-  Future? _future;
 
   @override
   void initState() {
     super.initState();
-    _future = _getGigs();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent * 0.8) {
-        if (!_loading) {
-          _loadMore();
-        }
+        ref.read(gifsProvider.notifier).loadMore();
       }
-    });
-  }
-
-  Future _getGigs() async {
-    _loading = true;
-    final search = _search;
-    Map<String, dynamic> data;
-    if (search == null || search.isEmpty) {
-      data = await _giphyService.getTrending(limit: 20);
-    } else {
-      data = await _giphyService.searchGifs(
-        query: search,
-        limit: 20,
-        offset: _offset,
-      );
-    }
-    _gifs.addAll(data['data']);
-    _loading = false;
-    return _gifs;
-  }
-
-  void _loadMore() {
-    setState(() {
-      _offset += 20;
-      _future = _getGigs();
     });
   }
 
   void _onSearchChanged(String text) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      _resetSearch(text);
-    });
-  }
-
-  void _resetSearch(String text) {
-    setState(() {
-      _search = text;
-      _offset = 0;
-      _gifs = [];
-      _future = _getGigs();
+      ref.read(gifsProvider.notifier).updateSearch(text);
     });
   }
 
@@ -90,6 +46,8 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(gifsProvider);
+    
     return Scaffold(
       backgroundColor: Color(0xff4C4E52),
       appBar: AppBar(
@@ -111,7 +69,7 @@ class _HomeViewState extends State<HomeView> {
                 onChanged: _onSearchChanged,
                 onSubmitted: (text) {
                   _debounce?.cancel();
-                  _resetSearch(text);
+                  ref.read(gifsProvider.notifier).updateSearch(text);
                 },
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -132,26 +90,9 @@ class _HomeViewState extends State<HomeView> {
               ),
             ),
             Expanded(
-              child: FutureBuilder(
-                future: _future,
-                builder: (context, AsyncSnapshot snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.waiting:
-                      if (_gifs.isEmpty) {
-                        return _buildSkeletonGrid();
-                      }
-                      return _createGigTable(context, _gifs);
-                    case ConnectionState.none:
-                      return _buildSkeletonGrid();
-                    default:
-                      if (snapshot.hasError) {
-                        return Container();
-                      } else {
-                        return _createGigTable(context, _gifs);
-                      }
-                  }
-                },
-              ),
+              child: state.isInitialLoading 
+                ? _buildSkeletonGrid()
+                : _createGigTable(context, state.gifs),
             ),
           ],
         ),
@@ -173,6 +114,15 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _createGigTable(BuildContext context, List data) {
+    if (data.isEmpty) {
+      return Center(
+        child: Text(
+          "No GIFs found",
+          style: TextStyle(color: Colors.white, fontSize: 18.0),
+        ),
+      );
+    }
+
     return GridView.builder(
       controller: _scrollController,
       padding: EdgeInsets.all(10.0),

@@ -53,7 +53,7 @@ void main() {
         queryParameters: {
           'api_key': 'nFpRCivJ74jdZjHMPgp2qsKDobPWhE4e',
           'q': query,
-          'limit': 19,
+          'limit': 20,
           'offset': 0,
           'rating': 'g',
           'lang': 'en',

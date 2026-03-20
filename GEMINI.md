@@ -9,7 +9,7 @@
 ### Core Technologies
 - **Framework:** Flutter (Dart) - targeting Web.
 - **HTTP Client:** `dio` for robust API requests and interceptors.
-- **State Management:** Standard `StatefulWidget` (MVP-first approach), with clear separation of UI and data fetching logic.
+- **State Management:** **Riverpod** (`flutter_riverpod`) with `StateNotifier` for clean, scalable state handling, separating UI from business logic.
 - **Sharing:** `share` package for social media integration (Telegram, Facebook, WhatsApp).
 - **Image Handling:** `transparent_image` for smooth, optimized loading transitions.
 - **CI/CD:** GitHub Actions for automated web builds and deployment to GitHub Pages.
@@ -22,8 +22,10 @@
 The project follows a standard but strictly organized Flutter directory structure to separate concerns:
 - `lib/main.dart`: Application entry point, theme configuration, and environment initialization.
 - `lib/ui/views/`: Contains the minimalist UI components.
-    - `home.view.dart`: Main search interface, high-density trending GIF grid, and state-based pagination logic.
+    - `home.view.dart`: Main search interface, high-density trending GIF grid, and Riverpod-powered pagination.
     - `gif.view.dart`: Detailed modal-like view for a selected GIF with sharing options.
+- `lib/providers/`: State management using Riverpod.
+    - `giphy_notifier.dart`: Manages the state of GIF searches, trending, and pagination.
 - `lib/services/`: Data fetching and API integration layers.
     - `giphy.service.dart`: Encapsulates Giphy API logic.
 - `images/`: Local assets.

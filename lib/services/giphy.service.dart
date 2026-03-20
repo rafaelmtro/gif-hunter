@@ -1,4 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final giphyServiceProvider = Provider((ref) => GiphyService());
 
 class GiphyService {
   final Dio _dio;
@@ -21,7 +24,7 @@ class GiphyService {
 
   Future<Map<String, dynamic>> searchGifs({
     required String query,
-    int limit = 19,
+    int limit = 20,
     int offset = 0,
     String rating = 'g',
     String lang = 'en',
