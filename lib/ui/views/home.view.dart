@@ -7,6 +7,7 @@ import 'package:share/share.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 import '../../providers/giphy_notifier.dart';
+import '../../providers/favorites_notifier.dart';
 import 'gif.view.dart';
 
 class HomeView extends ConsumerStatefulWidget {
@@ -40,6 +41,13 @@ class _HomeViewState extends ConsumerState<HomeView> {
     ref.read(gifsProvider.notifier).toggleTag(tag);
   }
 
+  void _showFavorites() {
+    showDialog(
+      context: context,
+      builder: (context) => FavoritesModal(),
+    );
+  }
+
   @override
   void dispose() {
     _debounce?.cancel();
@@ -53,7 +61,6 @@ class _HomeViewState extends ConsumerState<HomeView> {
     final state = ref.watch(gifsProvider);
     final trendingTagsAsync = ref.watch(trendingTagsProvider);
 
-    // Sync controller with state (clearing it when state search is cleared)
     if (state.search.isEmpty && _textEditCtrl.text.isNotEmpty) {
       _textEditCtrl.clear();
     }
@@ -127,7 +134,37 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(width: 170.0), // Space matching the name + gap
+                    // Left Sidebar with Favorites
+                    SizedBox(
+                      width: 150.0,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          InkWell(
+                            onTap: _showFavorites,
+                            borderRadius: BorderRadius.circular(10.0),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 5.0),
+                              child: Row(
+                                children: const [
+                                  Icon(Icons.favorite, color: Colors.orange, size: 20.0),
+                                  SizedBox(width: 10.0),
+                                  Text(
+                                    'Favorites',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 20.0),
                     Expanded(
                       flex: 4,
                       child: state.isInitialLoading 
@@ -135,7 +172,6 @@ class _HomeViewState extends ConsumerState<HomeView> {
                         : _createGigTable(context, state.gifs),
                     ),
                     const SizedBox(width: 40.0),
-                    // Dedicated Trending Tags Sidebar
                     SizedBox(
                       width: 220.0,
                       child: Column(
@@ -238,7 +274,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
   }
 }
 
-class HoverableGifItem extends StatefulWidget {
+class HoverableGifItem extends ConsumerStatefulWidget {
   final Map gifData;
 
   const HoverableGifItem({Key? key, required this.gifData}) : super(key: key);
@@ -247,13 +283,15 @@ class HoverableGifItem extends StatefulWidget {
   _HoverableGifItemState createState() => _HoverableGifItemState();
 }
 
-class _HoverableGifItemState extends State<HoverableGifItem> {
+class _HoverableGifItemState extends ConsumerState<HoverableGifItem> {
   bool _isHovered = false;
 
   @override
   Widget build(BuildContext context) {
     final String staticUrl = widget.gifData['images']['fixed_height_still']['url'];
     final String animatedUrl = widget.gifData['images']['fixed_height']['url'];
+    final favorites = ref.watch(favoritesProvider);
+    final bool isFavorite = favorites.any((item) => item['id'] == widget.gifData['id']);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -287,29 +325,111 @@ class _HoverableGifItemState extends State<HoverableGifItem> {
               Positioned(
                 top: 5.0,
                 right: 5.0,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.copy, color: Colors.white, size: 20.0),
-                    tooltip: 'Copy Link',
-                    onPressed: () {
-                      Clipboard.setData(ClipboardData(text: animatedUrl));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Link copied to clipboard!'),
-                          duration: Duration(seconds: 2),
-                          backgroundColor: Colors.orange,
+                child: Row(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.5),
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: isFavorite ? Colors.red : Colors.white,
+                          size: 20.0,
                         ),
-                      );
-                    },
-                  ),
+                        tooltip: isFavorite ? 'Remove from Favorites' : 'Add to Favorites',
+                        onPressed: () {
+                          ref.read(favoritesProvider.notifier).toggleFavorite(Map<String, dynamic>.from(widget.gifData));
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 5.0),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.5),
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.copy, color: Colors.white, size: 20.0),
+                        tooltip: 'Copy Link',
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(text: animatedUrl));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Link copied to clipboard!'),
+                              duration: Duration(seconds: 2),
+                              backgroundColor: Colors.orange,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class FavoritesModal extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final favorites = ref.watch(favoritesProvider);
+
+    return Dialog(
+      backgroundColor: Colors.black,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 40.0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.8,
+        height: MediaQuery.of(context).size.height * 0.8,
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'My Favorite GIFs',
+                  style: TextStyle(
+                    color: Colors.orange,
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20.0),
+            Expanded(
+              child: favorites.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'No favorites yet. Start hearting some GIFs!',
+                        style: TextStyle(color: Colors.white70, fontSize: 18.0),
+                      ),
+                    )
+                  : GridView.builder(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 5,
+                        crossAxisSpacing: 8.0,
+                        mainAxisSpacing: 8.0,
+                      ),
+                      itemCount: favorites.length,
+                      itemBuilder: (context, index) {
+                        return HoverableGifItem(gifData: favorites[index]);
+                      },
+                    ),
+            ),
+          ],
         ),
       ),
     );
