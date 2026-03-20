@@ -95,8 +95,9 @@ class GifsNotifier extends StateNotifier<GifsState> {
       newTags.add(tag);
     }
     
+    // Clear manual search when a tag is toggled to ensure clean tag-only results
     state = GifsState(
-      search: state.search,
+      search: '',
       selectedTags: newTags,
       isInitialLoading: true,
     );

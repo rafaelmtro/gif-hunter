@@ -8,7 +8,6 @@ import 'package:transparent_image/transparent_image.dart';
 
 import '../../providers/giphy_notifier.dart';
 import '../../providers/favorites_notifier.dart';
-import 'gif.view.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   @override
@@ -288,6 +287,15 @@ class HoverableGifItem extends ConsumerStatefulWidget {
 
 class _HoverableGifItemState extends ConsumerState<HoverableGifItem> {
   bool _isHovered = false;
+  bool _showCopiedIndicator = false;
+
+  void _onCopy(String animatedUrl) {
+    Clipboard.setData(ClipboardData(text: animatedUrl));
+    setState(() => _showCopiedIndicator = true);
+    Timer(const Duration(seconds: 2), () {
+      if (mounted) setState(() => _showCopiedIndicator = false);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -301,13 +309,9 @@ class _HoverableGifItemState extends ConsumerState<HoverableGifItem> {
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return GifView(widget.gifData);
-              },
-            ),
+          showDialog(
+            context: context,
+            builder: (context) => GifDetailModal(gifData: widget.gifData),
           );
         },
         onLongPress: () {
@@ -356,19 +360,114 @@ class _HoverableGifItemState extends ConsumerState<HoverableGifItem> {
                       child: IconButton(
                         icon: const Icon(Icons.copy, color: Colors.white, size: 20.0),
                         tooltip: 'Copy Link',
-                        onPressed: () {
-                          Clipboard.setData(ClipboardData(text: animatedUrl));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Link copied to clipboard!'),
-                              duration: Duration(seconds: 2),
-                              backgroundColor: Colors.orange,
-                            ),
-                          );
-                        },
+                        onPressed: () => _onCopy(animatedUrl),
                       ),
                     ),
                   ],
+                ),
+              ),
+              if (_showCopiedIndicator)
+                Positioned.fill(
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 300),
+                    opacity: _showCopiedIndicator ? 1.0 : 0.0,
+                    child: Container(
+                      color: Colors.black.withOpacity(0.7),
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            Icon(Icons.check_circle, color: Colors.orange, size: 40.0),
+                            SizedBox(height: 8.0),
+                            Text(
+                              'Copied!',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16.0,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class GifDetailModal extends StatelessWidget {
+  final Map gifData;
+
+  const GifDetailModal({Key? key, required this.gifData}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final String gifUrl = gifData['images']['fixed_height']['url'];
+    final String title = gifData['title'] ?? 'GIF Detail';
+    final String? username = gifData['user']?['display_name'] ?? gifData['username'];
+
+    return Dialog(
+      backgroundColor: const Color(0xff1A1A1A),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.0)),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: 600.0, maxHeight: MediaQuery.of(context).size.height * 0.8),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            color: Colors.orange,
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (username != null && username.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4.0),
+                            child: Text(
+                              'Published by: $username',
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14.0,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20.0),
+              Flexible(
+                child: Center(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16.0),
+                    child: Image.network(
+                      gifUrl,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
               ),
             ],
