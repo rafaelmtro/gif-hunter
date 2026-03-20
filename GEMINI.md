@@ -50,6 +50,7 @@ The project follows a standard but strictly organized Flutter directory structur
     - **Infinite Scroll with Smart Pre-fetching:** Automatically fetches the next set of results when the user is 80% down the current list, creating an "endless" browsing experience.
     - **One-Tap Copy to Clipboard:** Quick-access "Copy Link" button on grid items to minimize steps for sharing GIFs.
     - **Hover-to-Play/Preview:** Grid items show static thumbnails by default, playing animations only on hover (Web) or long-press (Mobile) to reduce visual noise.
+    - **Trending Tag "Pills":** Horizontally scrolling list of trending search terms below the search bar to encourage exploration.
     - **Modern Minimalist UI:** Deep black backgrounds with orange highlights, featuring rounded shapes (grid items, search bar) for a smooth visual experience and asymmetric horizontal screen margins (40px left, 100px right).
     - **Google-style Header Refactor:** App name integrated to the left of a constrained search bar (supporting line breaks). The grid starts after the header row, maintaining a dedicated horizontal offset that keeps the space below the app name clean.
 

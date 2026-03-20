@@ -6,13 +6,13 @@ final giphyServiceProvider = Provider((ref) => GiphyService());
 class GiphyService {
   final Dio _dio;
   static const String _apiKey = 'nFpRCivJ74jdZjHMPgp2qsKDobPWhE4e';
-  static const String _baseUrl = 'https://api.giphy.com/v1/gifs';
+  static const String _baseUrl = 'https://api.giphy.com/v1';
 
   GiphyService({Dio? dio}) : _dio = dio ?? Dio();
 
   Future<Map<String, dynamic>> getTrending({int limit = 20, String rating = 'g'}) async {
     final response = await _dio.get(
-      '$_baseUrl/trending',
+      '$_baseUrl/gifs/trending',
       queryParameters: {
         'api_key': _apiKey,
         'limit': limit,
@@ -30,7 +30,7 @@ class GiphyService {
     String lang = 'en',
   }) async {
     final response = await _dio.get(
-      '$_baseUrl/search',
+      '$_baseUrl/gifs/search',
       queryParameters: {
         'api_key': _apiKey,
         'q': query,
@@ -41,5 +41,15 @@ class GiphyService {
       },
     );
     return response.data;
+  }
+
+  Future<List<String>> getTrendingSearches() async {
+    final response = await _dio.get(
+      '$_baseUrl/trending/searches',
+      queryParameters: {
+        'api_key': _apiKey,
+      },
+    );
+    return List<String>.from(response.data['data']);
   }
 }

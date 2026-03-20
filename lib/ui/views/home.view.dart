@@ -36,6 +36,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
     });
   }
 
+  void _onTagSelected(String tag) {
+    _textEditCtrl.text = tag;
+    ref.read(gifsProvider.notifier).updateSearch(tag);
+  }
+
   @override
   void dispose() {
     _debounce?.cancel();
@@ -47,6 +52,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(gifsProvider);
+    final trendingTagsAsync = ref.watch(trendingTagsProvider);
     
     return Scaffold(
       backgroundColor: Colors.black,
@@ -75,38 +81,67 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   const SizedBox(width: 20.0),
                   Expanded(
                     flex: 2,
-                    child: TextField(
-                      controller: _textEditCtrl,
-                      onChanged: _onSearchChanged,
-                      onSubmitted: (text) {
-                        _debounce?.cancel();
-                        ref.read(gifsProvider.notifier).updateSearch(text);
-                      },
-                      textAlign: TextAlign.left,
-                      maxLines: null,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16.0,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: 'Search here',
-                        hintStyle: const TextStyle(color: Colors.grey),
-                        filled: true,
-                        fillColor: const Color(0xff1A1A1A),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                          borderSide: BorderSide.none,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextField(
+                          controller: _textEditCtrl,
+                          onChanged: _onSearchChanged,
+                          onSubmitted: (text) {
+                            _debounce?.cancel();
+                            ref.read(gifsProvider.notifier).updateSearch(text);
+                          },
+                          textAlign: TextAlign.left,
+                          maxLines: null,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16.0,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'Search here',
+                            hintStyle: const TextStyle(color: Colors.grey),
+                            filled: true,
+                            fillColor: const Color(0xff1A1A1A),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                              borderSide: BorderSide.none,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                              borderSide: BorderSide.none,
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                              borderSide: const BorderSide(color: Colors.orange, width: 1.0),
+                            ),
+                          ),
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                          borderSide: BorderSide.none,
+                        const SizedBox(height: 12.0),
+                        trendingTagsAsync.when(
+                          data: (tags) => SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: tags.map((tag) => Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: ActionChip(
+                                  label: Text(
+                                    '#$tag',
+                                    style: const TextStyle(color: Colors.white, fontSize: 12.0),
+                                  ),
+                                  backgroundColor: const Color(0xff1A1A1A),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20.0),
+                                  ),
+                                  onPressed: () => _onTagSelected(tag),
+                                ),
+                              )).toList(),
+                            ),
+                          ),
+                          loading: () => const SizedBox(height: 32.0),
+                          error: (_, __) => const SizedBox.shrink(),
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                          borderSide: const BorderSide(color: Colors.orange, width: 1.0),
-                        ),
-                      ),
+                      ],
                     ),
                   ),
                   const Spacer(flex: 1),

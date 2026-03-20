@@ -84,3 +84,8 @@ final gifsProvider = StateNotifierProvider<GifsNotifier, GifsState>((ref) {
   final giphyService = ref.watch(giphyServiceProvider);
   return GifsNotifier(giphyService);
 });
+
+final trendingTagsProvider = FutureProvider<List<String>>((ref) async {
+  final giphyService = ref.watch(giphyServiceProvider);
+  return giphyService.getTrendingSearches();
+});
