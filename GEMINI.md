@@ -24,7 +24,8 @@ The project follows a standard but strictly organized Flutter directory structur
 - `lib/ui/views/`: Contains the minimalist UI components.
     - `home.view.dart`: Main search interface, high-density trending GIF grid, and state-based pagination logic.
     - `gif.view.dart`: Detailed modal-like view for a selected GIF with sharing options.
-- `lib/services/`: (Recommended) Data fetching and API integration layers.
+- `lib/services/`: Data fetching and API integration layers.
+    - `giphy.service.dart`: Encapsulates Giphy API logic.
 - `images/`: Local assets.
 
 **Environment Configuration & Security:**
@@ -67,8 +68,8 @@ This project strictly follows a feature-branch workflow to maintain a stable cod
 - **Strict Typing:** Avoid `dynamic` types in Dart whenever possible. Leverage strong typing for API models and state variables to prevent runtime errors.
 - **Pragmatism:** MVP-first approach. Focus on delivering the end-to-end flow before over-optimizing state management or architectural patterns.
 - **Testing:** Comprehensive testing is mandatory for system stability.
+    - **Unit Tests:** Implemented for `GiphyService` using `http_mock_adapter` to verify API integration.
     - **Widget Tests:** Required for core UI components (e.g., ensuring the grid renders correctly, sharing buttons trigger appropriately).
-    - **Unit Tests:** Required for data parsing, API services, and pagination logic.
 
 ---
 
