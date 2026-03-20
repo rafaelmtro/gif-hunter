@@ -161,16 +161,20 @@ class _HomeViewState extends ConsumerState<HomeView> {
                                     final isSelected = state.selectedTags.contains(tag);
                                     return InkWell(
                                       onTap: () => _onTagToggled(tag),
-                                      borderRadius: BorderRadius.circular(4.0),
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 2.0),
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      child: AnimatedContainer(
+                                        duration: const Duration(milliseconds: 200),
+                                        padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10.0),
+                                        decoration: BoxDecoration(
+                                          color: isSelected ? Colors.orange : Colors.transparent,
+                                          borderRadius: BorderRadius.circular(20.0),
+                                        ),
                                         child: Text(
                                           '#$tag',
                                           style: TextStyle(
-                                            color: isSelected ? Colors.orange : Colors.white70,
+                                            color: isSelected ? Colors.black : Colors.white70,
                                             fontSize: 16.0,
                                             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                            decoration: isSelected ? TextDecoration.underline : TextDecoration.none,
                                           ),
                                         ),
                                       ),
