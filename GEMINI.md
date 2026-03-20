@@ -43,6 +43,7 @@ The project follows a standard but strictly organized Flutter directory structur
     - High-density grid layout for efficient browsing.
     - Smooth image loading transitions to prevent layout shifts.
     - Interactive elements with clear feedback (e.g., hover states, loading indicators).
+    - **Debounced "Search-as-you-type":** Instantaneous and fluid search that automatically triggers API fetch after 500ms of user inactivity.
 
 ---
 
