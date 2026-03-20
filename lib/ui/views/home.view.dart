@@ -1,4 +1,5 @@
-import 'package:dio/dio.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:share/share.dart';
 import 'package:transparent_image/transparent_image.dart';
@@ -16,6 +17,7 @@ class _HomeViewState extends State<HomeView> {
   final _giphyService = GiphyService();
   String? _search;
   int _offset = 0;
+  Timer? _debounce;
 
   _getGigs() async {
     final search = _search;
@@ -31,7 +33,24 @@ class _HomeViewState extends State<HomeView> {
   }
 
   @override
-...
+  void dispose() {
+    _debounce?.cancel();
+    _textEditCtrl.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String text) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      setState(() {
+        _search = text;
+        _offset = 0;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xff4C4E52),
       appBar: AppBar(
@@ -50,7 +69,9 @@ class _HomeViewState extends State<HomeView> {
               padding: EdgeInsets.all(10.0),
               child: TextField(
                 controller: _textEditCtrl,
+                onChanged: _onSearchChanged,
                 onSubmitted: (text) {
+                  _debounce?.cancel();
                   setState(() {
                     _search = text;
                     _offset = 0;
