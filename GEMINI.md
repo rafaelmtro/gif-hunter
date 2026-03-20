@@ -50,9 +50,9 @@ The project follows a standard but strictly organized Flutter directory structur
     - **Infinite Scroll with Smart Pre-fetching:** Automatically fetches the next set of results when the user is 80% down the current list, creating an "endless" browsing experience.
     - **One-Tap Copy to Clipboard:** Quick-access "Copy Link" button on grid items to minimize steps for sharing GIFs.
     - **Hover-to-Play/Preview:** Grid items show static thumbnails by default, playing animations only on hover (Web) or long-press (Mobile) to reduce visual noise.
-    - **Personalized "Favorites" Gallery:** Local storage persistence (`shared_preferences`) allowing users to "heart" GIFs. A right-aligned sidebar item opens a modal gallery with a smooth grey background, "Favorite GIFs" header, and prominent rounded corners for a consistent modern look.
+    - **Personalized "Favorites" Gallery:** Local storage persistence (`shared_preferences`) allowing users to "heart" GIFs. A right-aligned sidebar item opens a modal gallery with a smooth grey background, "Favorite GIFs" header, and prominent rounded corners. Empty states feature subtle highlighting for better visibility.
     - **Multi-Tag Selection Box:** Dedicated section on the right displaying trending tags in a clean, text-based grid (no background). Supports multi-selection with light orange "aura" backgrounds for visual feedback; tags are automatically deselected when a new manual search is typed. Aligned precisely with the top of the search results for a balanced layout.
-    - **Modern Minimalist UI:** Deep black backgrounds with orange highlights, featuring rounded shapes (grid items, search bar) for a smooth visual experience and consistent screen margins.
+    - **Modern Minimalist UI:** Deep black backgrounds with orange highlights, featuring rounded shapes (grid items, search bar) for a smooth visual experience and consistent screen margins. Highlights (text selection in search bar) use a themed light orange color.
     - **Google-style Header Refactor:** App name integrated to the left of a constrained search bar (supporting line breaks). The grid starts after the header row, maintaining a dedicated horizontal offset that keeps the space below the app name clean.
 
 ---

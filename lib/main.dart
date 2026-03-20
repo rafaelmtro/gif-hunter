@@ -16,6 +16,11 @@ void main() {
             backgroundColor: Colors.black,
             elevation: 0,
           ),
+          textSelectionTheme: TextSelectionThemeData(
+            selectionColor: Colors.orange.withOpacity(0.3),
+            selectionHandleColor: Colors.orange,
+            cursorColor: Colors.orange,
+          ),
         ),
         home: HomeView(),
       ),

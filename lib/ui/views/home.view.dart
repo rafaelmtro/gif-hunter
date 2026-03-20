@@ -174,6 +174,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                         : _createGigTable(context, state.gifs),
                     ),
                     const SizedBox(width: 40.0),
+                    // Dedicated Trending Tags Sidebar
                     SizedBox(
                       width: 220.0,
                       child: Column(
@@ -413,10 +414,17 @@ class FavoritesModal extends ConsumerWidget {
             const SizedBox(height: 20.0),
             Expanded(
               child: favorites.isEmpty
-                  ? const Center(
-                      child: Text(
-                        'No favorites yet. Start hearting some GIFs!',
-                        style: TextStyle(color: Colors.white70, fontSize: 18.0),
+                  ? Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        child: const Text(
+                          'No favorites yet. Start hearting some GIFs!',
+                          style: TextStyle(color: Colors.white70, fontSize: 18.0),
+                        ),
                       ),
                     )
                   : GridView.builder(
