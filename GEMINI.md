@@ -46,6 +46,7 @@ The project follows a standard but strictly organized Flutter directory structur
     - **Debounced "Search-as-you-type":** Instantaneous and fluid search that automatically triggers API fetch after 500ms of user inactivity.
     - **Skeleton Loading States:** Custom shimmer effect in the high-density grid provides better visual feedback that content is specifically "loading" rather than just "missing".
     - **Infinite Scroll with Smart Pre-fetching:** Automatically fetches the next set of results when the user is 80% down the current list, creating an "endless" browsing experience.
+    - **One-Tap Copy to Clipboard:** Quick-access "Copy Link" button on grid items to minimize steps for sharing GIFs.
 
 ---
 

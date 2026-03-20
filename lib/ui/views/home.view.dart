@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:share/share.dart';
 import 'package:transparent_image/transparent_image.dart';
 
@@ -182,6 +183,7 @@ class _HomeViewState extends State<HomeView> {
       ),
       itemCount: data.length,
       itemBuilder: (context, index) {
+        final gifUrl = data[index]['images']['fixed_height']['url'];
         return GestureDetector(
           onTap: () {
             Navigator.push(
@@ -194,13 +196,42 @@ class _HomeViewState extends State<HomeView> {
             );
           },
           onLongPress: () {
-            Share.share(data[index]['images']['fixed_height']['url']);
+            Share.share(gifUrl);
           },
-          child: FadeInImage.memoryNetwork(
-            placeholder: kTransparentImage,
-            image: data[index]['images']['fixed_height']['url'],
-            height: 300.0,
-            fit: BoxFit.cover,
+          child: Stack(
+            children: [
+              FadeInImage.memoryNetwork(
+                placeholder: kTransparentImage,
+                image: gifUrl,
+                height: 300.0,
+                width: 300.0,
+                fit: BoxFit.cover,
+              ),
+              Positioned(
+                top: 5.0,
+                right: 5.0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: Icon(Icons.copy, color: Colors.white, size: 20.0),
+                    tooltip: 'Copy Link',
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(text: gifUrl));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Link copied to clipboard!'),
+                          duration: Duration(seconds: 2),
+                          backgroundColor: Colors.orange,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       },
