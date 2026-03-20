@@ -287,22 +287,11 @@ class HoverableGifItem extends ConsumerStatefulWidget {
 
 class _HoverableGifItemState extends ConsumerState<HoverableGifItem> {
   bool _isHovered = false;
-  bool _showCopiedIndicator = false;
-
-  void _onCopy(String animatedUrl) {
-    Clipboard.setData(ClipboardData(text: animatedUrl));
-    setState(() => _showCopiedIndicator = true);
-    Timer(const Duration(seconds: 2), () {
-      if (mounted) setState(() => _showCopiedIndicator = false);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     final String staticUrl = widget.gifData['images']['fixed_height_still']['url'];
     final String animatedUrl = widget.gifData['images']['fixed_height']['url'];
-    final favorites = ref.watch(favoritesProvider);
-    final bool isFavorite = favorites.any((item) => item['id'] == widget.gifData['id']);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -329,74 +318,108 @@ class _HoverableGifItemState extends ConsumerState<HoverableGifItem> {
                 width: 300.0,
                 fit: BoxFit.cover,
               ),
-              Positioned(
-                top: 5.0,
-                right: 5.0,
-                child: Row(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
-                        shape: BoxShape.circle,
-                      ),
-                      child: IconButton(
-                        icon: Icon(
-                          isFavorite ? Icons.favorite : Icons.favorite_border,
-                          color: isFavorite ? Colors.red : Colors.white,
-                          size: 20.0,
-                        ),
-                        tooltip: isFavorite ? 'Remove from Favorites' : 'Add to Favorites',
-                        onPressed: () {
-                          ref.read(favoritesProvider.notifier).toggleFavorite(Map<String, dynamic>.from(widget.gifData));
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 5.0),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
-                        shape: BoxShape.circle,
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.copy, color: Colors.white, size: 20.0),
-                        tooltip: 'Copy Link',
-                        onPressed: () => _onCopy(animatedUrl),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (_showCopiedIndicator)
-                Positioned.fill(
-                  child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 300),
-                    opacity: _showCopiedIndicator ? 1.0 : 0.0,
-                    child: Container(
-                      color: Colors.black.withOpacity(0.7),
-                      child: Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: const [
-                            Icon(Icons.check_circle, color: Colors.orange, size: 40.0),
-                            SizedBox(height: 8.0),
-                            Text(
-                              'Copied!',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16.0,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+              GifActionsOverlay(gifData: widget.gifData),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class GifActionsOverlay extends ConsumerStatefulWidget {
+  final Map gifData;
+
+  const GifActionsOverlay({Key? key, required this.gifData}) : super(key: key);
+
+  @override
+  _GifActionsOverlayState createState() => _GifActionsOverlayState();
+}
+
+class _GifActionsOverlayState extends ConsumerState<GifActionsOverlay> {
+  bool _showCopiedIndicator = false;
+
+  void _onCopy(String animatedUrl) {
+    Clipboard.setData(ClipboardData(text: animatedUrl));
+    setState(() => _showCopiedIndicator = true);
+    Timer(const Duration(seconds: 2), () {
+      if (mounted) setState(() => _showCopiedIndicator = false);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final String animatedUrl = widget.gifData['images']['fixed_height']['url'];
+    final favorites = ref.watch(favoritesProvider);
+    final bool isFavorite = favorites.any((item) => item['id'] == widget.gifData['id']);
+
+    return Stack(
+      children: [
+        Positioned(
+          top: 5.0,
+          right: 5.0,
+          child: Row(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.5),
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: Icon(
+                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: isFavorite ? Colors.red : Colors.white,
+                    size: 20.0,
+                  ),
+                  tooltip: isFavorite ? 'Remove from Favorites' : 'Add to Favorites',
+                  onPressed: () {
+                    ref.read(favoritesProvider.notifier).toggleFavorite(Map<String, dynamic>.from(widget.gifData));
+                  },
+                ),
+              ),
+              const SizedBox(width: 5.0),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.5),
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.copy, color: Colors.white, size: 20.0),
+                  tooltip: 'Copy Link',
+                  onPressed: () => _onCopy(animatedUrl),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (_showCopiedIndicator)
+          Positioned.fill(
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 300),
+              opacity: _showCopiedIndicator ? 1.0 : 0.0,
+              child: Container(
+                color: Colors.black.withOpacity(0.7),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.check_circle, color: Colors.orange, size: 40.0),
+                      SizedBox(height: 8.0),
+                      Text(
+                        'Copied!',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
@@ -416,7 +439,10 @@ class GifDetailModal extends StatelessWidget {
       backgroundColor: const Color(0xff1A1A1A),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.0)),
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: 600.0, maxHeight: MediaQuery.of(context).size.height * 0.8),
+        constraints: BoxConstraints(
+          maxWidth: 500.0, 
+          maxHeight: MediaQuery.of(context).size.height * 0.7
+        ),
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
@@ -434,18 +460,18 @@ class GifDetailModal extends StatelessWidget {
                           title,
                           style: const TextStyle(
                             color: Colors.orange,
-                            fontSize: 20.0,
+                            fontSize: 24.0,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         if (username != null && username.isNotEmpty)
                           Padding(
-                            padding: const EdgeInsets.only(top: 4.0),
+                            padding: const EdgeInsets.only(top: 6.0),
                             child: Text(
                               'Published by: $username',
                               style: const TextStyle(
                                 color: Colors.white70,
-                                fontSize: 14.0,
+                                fontSize: 18.0,
                               ),
                             ),
                           ),
@@ -463,9 +489,14 @@ class GifDetailModal extends StatelessWidget {
                 child: Center(
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(16.0),
-                    child: Image.network(
-                      gifUrl,
-                      fit: BoxFit.contain,
+                    child: Stack(
+                      children: [
+                        Image.network(
+                          gifUrl,
+                          fit: BoxFit.contain,
+                        ),
+                        Positioned.fill(child: GifActionsOverlay(gifData: gifData)),
+                      ],
                     ),
                   ),
                 ),

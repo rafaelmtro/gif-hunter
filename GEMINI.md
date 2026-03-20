@@ -49,7 +49,7 @@ The project follows a standard but strictly organized Flutter directory structur
     - **Infinite Scroll with Smart Pre-fetching:** Automatically fetches the next set of results when the user is 80% down the current list, creating an "endless" browsing experience.
     - **One-Tap Copy to Clipboard:** Quick-access "Copy Link" button on grid items with a smooth, in-place "Copied!" overlay for immediate visual confirmation.
     - **Hover-to-Play/Preview:** Grid items show static thumbnails by default, playing animations only on hover (Web) or long-press (Mobile) to reduce visual noise.
-    - **GIF Detail Modal:** Clicking a GIF opens a high-fidelity modal displaying the animation, its title, and publisher/creator name, maintaining user context.
+    - **GIF Detail Modal:** Clicking a GIF opens a compact, high-fidelity modal displaying the animation, its title (large), and publisher name (medium). Integrated action buttons (heart and copy) allow for direct interaction within the modal.
     - **Personalized "Favorites" Gallery:** Local storage persistence (`shared_preferences`) allowing users to "heart" GIFs. A right-aligned sidebar item opens a modal gallery with a smooth grey background and "Favorite GIFs" header.
     - **Multi-Tag Selection Box:** Dedicated section on the right displaying trending tags. Supports multi-selection with light orange "aura" backgrounds; manual search is automatically cleared when tags are selected for a clean transition.
     - **Modern Minimalist UI:** Deep black backgrounds with orange highlights, featuring rounded shapes (grid items, search bar) for a smooth visual experience and consistent screen margins. Highlights (text selection in search bar) use a themed light orange color.
