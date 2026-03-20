@@ -50,66 +50,84 @@ class _HomeViewState extends ConsumerState<HomeView> {
     
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(80.0),
+      body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-          child: SafeArea(
-            child: Row(
-              children: [
-                const Text(
-                  'GIF Hunter',
-                  style: TextStyle(
-                    color: Colors.orange,
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(width: 20.0),
-                Expanded(
-                  child: TextField(
-                    controller: _textEditCtrl,
-                    onChanged: _onSearchChanged,
-                    onSubmitted: (text) {
-                      _debounce?.cancel();
-                      ref.read(gifsProvider.notifier).updateSearch(text);
-                    },
-                    textAlign: TextAlign.left,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.0,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: 'Search here',
-                      hintStyle: const TextStyle(color: Colors.grey),
-                      filled: true,
-                      fillColor: const Color(0xff1A1A1A),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                        borderSide: const BorderSide(color: Colors.orange, width: 1.0),
+          padding: const EdgeInsets.symmetric(horizontal: 100.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20.0),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 150.0,
+                    padding: const EdgeInsets.only(top: 10.0),
+                    child: const Text(
+                      'GIF Hunter',
+                      style: TextStyle(
+                        color: Colors.orange,
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
+                  const SizedBox(width: 20.0),
+                  Expanded(
+                    flex: 2,
+                    child: TextField(
+                      controller: _textEditCtrl,
+                      onChanged: _onSearchChanged,
+                      onSubmitted: (text) {
+                        _debounce?.cancel();
+                        ref.read(gifsProvider.notifier).updateSearch(text);
+                      },
+                      textAlign: TextAlign.left,
+                      maxLines: null,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16.0,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Search here',
+                        hintStyle: const TextStyle(color: Colors.grey),
+                        filled: true,
+                        fillColor: const Color(0xff1A1A1A),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          borderSide: const BorderSide(color: Colors.orange, width: 1.0),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const Spacer(flex: 1),
+                ],
+              ),
+              const SizedBox(height: 20.0),
+              Expanded(
+                child: Row(
+                  children: [
+                    const SizedBox(width: 170.0), // Space matching the name + gap
+                    Expanded(
+                      child: state.isInitialLoading 
+                        ? _buildSkeletonGrid()
+                        : _createGigTable(context, state.gifs),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-      ),
-      body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        child: state.isInitialLoading 
-          ? _buildSkeletonGrid()
-          : _createGigTable(context, state.gifs),
       ),
     );
   }
@@ -118,7 +136,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
     return GridView.builder(
       padding: const EdgeInsets.all(10.0),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 6,
+        crossAxisCount: 5,
         crossAxisSpacing: 8.0,
         mainAxisSpacing: 8.0,
       ),
@@ -141,7 +159,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
       controller: _scrollController,
       padding: const EdgeInsets.all(10.0),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 6,
+        crossAxisCount: 5,
         crossAxisSpacing: 8.0,
         mainAxisSpacing: 8.0,
       ),
