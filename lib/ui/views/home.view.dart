@@ -80,6 +80,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   Container(
                     width: 150.0,
                     padding: const EdgeInsets.only(top: 10.0),
+                    alignment: Alignment.centerRight,
                     child: const Text(
                       'GIF Hunter',
                       style: TextStyle(
@@ -138,7 +139,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                     SizedBox(
                       width: 150.0,
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           InkWell(
                             onTap: _showFavorites,
@@ -146,6 +147,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                             child: Padding(
                               padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 5.0),
                               child: Row(
+                                mainAxisSize: MainAxisSize.min,
                                 children: const [
                                   Icon(Icons.favorite, color: Colors.orange, size: 20.0),
                                   SizedBox(width: 10.0),
@@ -382,9 +384,9 @@ class FavoritesModal extends ConsumerWidget {
     final favorites = ref.watch(favoritesProvider);
 
     return Dialog(
-      backgroundColor: Colors.black,
+      backgroundColor: const Color(0xff1A1A1A),
       insetPadding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 40.0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.0)),
       child: Container(
         width: MediaQuery.of(context).size.width * 0.8,
         height: MediaQuery.of(context).size.height * 0.8,
@@ -395,7 +397,7 @@ class FavoritesModal extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'My Favorite GIFs',
+                  'Favorite GIFs',
                   style: TextStyle(
                     color: Colors.orange,
                     fontSize: 24.0,
