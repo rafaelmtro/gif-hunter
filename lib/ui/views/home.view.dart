@@ -141,49 +141,41 @@ class _HomeViewState extends ConsumerState<HomeView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 10.0),
-                            child: Text(
-                              'Trending Tags',
-                              style: TextStyle(
-                                color: Colors.orange,
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          const Text(
+                            'Trending Tags',
+                            style: TextStyle(
+                              color: Colors.orange,
+                              fontSize: 22.0,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
+                          const SizedBox(height: 10.0),
                           Expanded(
                             child: trendingTagsAsync.when(
                               data: (tags) => SingleChildScrollView(
-                                child: Container(
-                                  padding: const EdgeInsets.all(12.0),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xff1A1A1A),
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                  child: Wrap(
-                                    spacing: 8.0,
-                                    runSpacing: 4.0,
-                                    children: tags.map((tag) {
-                                      final isSelected = state.selectedTags.contains(tag);
-                                      return InkWell(
-                                        onTap: () => _onTagToggled(tag),
-                                        borderRadius: BorderRadius.circular(4.0),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
-                                          child: Text(
-                                            '#$tag',
-                                            style: TextStyle(
-                                              color: isSelected ? Colors.orange : Colors.white70,
-                                              fontSize: 14.0,
-                                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                              decoration: isSelected ? TextDecoration.underline : TextDecoration.none,
-                                            ),
+                                child: Wrap(
+                                  spacing: 12.0,
+                                  runSpacing: 8.0,
+                                  alignment: WrapAlignment.start,
+                                  children: tags.map((tag) {
+                                    final isSelected = state.selectedTags.contains(tag);
+                                    return InkWell(
+                                      onTap: () => _onTagToggled(tag),
+                                      borderRadius: BorderRadius.circular(4.0),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 2.0),
+                                        child: Text(
+                                          '#$tag',
+                                          style: TextStyle(
+                                            color: isSelected ? Colors.orange : Colors.white70,
+                                            fontSize: 16.0,
+                                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                            decoration: isSelected ? TextDecoration.underline : TextDecoration.none,
                                           ),
                                         ),
-                                      );
-                                    }).toList(),
-                                  ),
+                                      ),
+                                    );
+                                  }).toList(),
                                 ),
                               ),
                               loading: () => const Center(child: CircularProgressIndicator(color: Colors.orange)),
