@@ -165,61 +165,86 @@ class _HomeViewState extends ConsumerState<HomeView> {
       ),
       itemCount: data.length,
       itemBuilder: (context, index) {
-        final gifUrl = data[index]['images']['fixed_height']['url'];
-        return GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return GifView(data[index]);
-                },
+        return HoverableGifItem(gifData: data[index]);
+      },
+    );
+  }
+}
+
+class HoverableGifItem extends StatefulWidget {
+  final Map gifData;
+
+  const HoverableGifItem({Key? key, required this.gifData}) : super(key: key);
+
+  @override
+  _HoverableGifItemState createState() => _HoverableGifItemState();
+}
+
+class _HoverableGifItemState extends State<HoverableGifItem> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final String staticUrl = widget.gifData['images']['fixed_height_still']['url'];
+    final String animatedUrl = widget.gifData['images']['fixed_height']['url'];
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return GifView(widget.gifData);
+              },
+            ),
+          );
+        },
+        onLongPress: () {
+          setState(() => _isHovered = true);
+          Share.share(animatedUrl);
+        },
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12.0),
+          child: Stack(
+            children: [
+              FadeInImage.memoryNetwork(
+                placeholder: kTransparentImage,
+                image: _isHovered ? animatedUrl : staticUrl,
+                height: 300.0,
+                width: 300.0,
+                fit: BoxFit.cover,
               ),
-            );
-          },
-          onLongPress: () {
-            Share.share(gifUrl);
-          },
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12.0),
-            child: Stack(
-              children: [
-                FadeInImage.memoryNetwork(
-                  placeholder: kTransparentImage,
-                  image: gifUrl,
-                  height: 300.0,
-                  width: 300.0,
-                  fit: BoxFit.cover,
-                ),
-                Positioned(
-                  top: 5.0,
-                  right: 5.0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.5),
-                      shape: BoxShape.circle,
-                    ),
-                    child: IconButton(
-                      icon: const Icon(Icons.copy, color: Colors.white, size: 20.0),
-                      tooltip: 'Copy Link',
-                      onPressed: () {
-                        Clipboard.setData(ClipboardData(text: gifUrl));
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Link copied to clipboard!'),
-                            duration: Duration(seconds: 2),
-                            backgroundColor: Colors.orange,
-                          ),
-                        );
-                      },
-                    ),
+              Positioned(
+                top: 5.0,
+                right: 5.0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.copy, color: Colors.white, size: 20.0),
+                    tooltip: 'Copy Link',
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(text: animatedUrl));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Link copied to clipboard!'),
+                          duration: Duration(seconds: 2),
+                          backgroundColor: Colors.orange,
+                        ),
+                      );
+                    },
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
