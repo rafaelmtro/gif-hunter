@@ -52,7 +52,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
       backgroundColor: Colors.black,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40.0),
+          padding: const EdgeInsets.only(left: 40.0, right: 100.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -136,7 +136,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
     return GridView.builder(
       padding: const EdgeInsets.all(10.0),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 6,
+        crossAxisCount: 5,
         crossAxisSpacing: 8.0,
         mainAxisSpacing: 8.0,
       ),
@@ -159,7 +159,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
       controller: _scrollController,
       padding: const EdgeInsets.all(10.0),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 6,
+        crossAxisCount: 5,
         crossAxisSpacing: 8.0,
         mainAxisSpacing: 8.0,
       ),

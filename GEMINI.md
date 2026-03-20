@@ -49,7 +49,7 @@ The project follows a standard but strictly organized Flutter directory structur
     - **Skeleton Loading States:** Custom shimmer effect in the high-density grid provides better visual feedback that content is specifically "loading" rather than just "missing".
     - **Infinite Scroll with Smart Pre-fetching:** Automatically fetches the next set of results when the user is 80% down the current list, creating an "endless" browsing experience.
     - **One-Tap Copy to Clipboard:** Quick-access "Copy Link" button on grid items to minimize steps for sharing GIFs.
-    - **Modern Minimalist UI:** Deep black backgrounds with orange highlights, featuring rounded shapes (grid items, search bar) for a smooth visual experience and 40px horizontal screen margins.
+    - **Modern Minimalist UI:** Deep black backgrounds with orange highlights, featuring rounded shapes (grid items, search bar) for a smooth visual experience and asymmetric horizontal screen margins (40px left, 100px right).
     - **Google-style Header Refactor:** App name integrated to the left of a constrained search bar (supporting line breaks). The grid starts after the header row, maintaining a dedicated horizontal offset that keeps the space below the app name clean.
 
 ---
