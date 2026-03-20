@@ -9,14 +9,12 @@ void main() {
         title: 'GIF Hunter',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primaryColor: Colors.white,
-          inputDecorationTheme: InputDecorationTheme(
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Color(0xffE6EEF7)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Color(0xffE6EEF7)),
-            ),
+          brightness: Brightness.dark,
+          primarySwatch: Colors.orange,
+          scaffoldBackgroundColor: Colors.black,
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.black,
+            elevation: 0,
           ),
         ),
         home: HomeView(),

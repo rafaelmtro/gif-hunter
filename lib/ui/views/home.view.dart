@@ -49,61 +49,75 @@ class _HomeViewState extends ConsumerState<HomeView> {
     final state = ref.watch(gifsProvider);
     
     return Scaffold(
-      backgroundColor: Color(0xff4C4E52),
-      appBar: AppBar(
-        backgroundColor: Color(0xff2E3033),
-        title: Image.asset(
-          'images/header.png',
-          height: 40.0,
-        ),
-        centerTitle: true,
-      ),
-      body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 100.0),
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.all(10.0),
-              child: TextField(
-                controller: _textEditCtrl,
-                onChanged: _onSearchChanged,
-                onSubmitted: (text) {
-                  _debounce?.cancel();
-                  ref.read(gifsProvider.notifier).updateSearch(text);
-                },
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                ),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Color(0xff6F7378),
-                  border: OutlineInputBorder(),
-                  labelText: 'Search here',
-                  labelStyle: TextStyle(
-                    color: Colors.white,
+      backgroundColor: Colors.black,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80.0),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+          child: SafeArea(
+            child: Row(
+              children: [
+                const Text(
+                  'GIF Hunter',
+                  style: TextStyle(
+                    color: Colors.orange,
+                    fontSize: 24.0,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
+                const SizedBox(width: 20.0),
+                Expanded(
+                  child: TextField(
+                    controller: _textEditCtrl,
+                    onChanged: _onSearchChanged,
+                    onSubmitted: (text) {
+                      _debounce?.cancel();
+                      ref.read(gifsProvider.notifier).updateSearch(text);
+                    },
+                    textAlign: TextAlign.left,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.0,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'Search here',
+                      hintStyle: const TextStyle(color: Colors.grey),
+                      filled: true,
+                      fillColor: const Color(0xff1A1A1A),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                        borderSide: const BorderSide(color: Colors.orange, width: 1.0),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            Expanded(
-              child: state.isInitialLoading 
-                ? _buildSkeletonGrid()
-                : _createGigTable(context, state.gifs),
-            ),
-          ],
+          ),
         ),
+      ),
+      body: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        child: state.isInitialLoading 
+          ? _buildSkeletonGrid()
+          : _createGigTable(context, state.gifs),
       ),
     );
   }
 
   Widget _buildSkeletonGrid() {
     return GridView.builder(
-      padding: EdgeInsets.all(10.0),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      padding: const EdgeInsets.all(10.0),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 6,
         crossAxisSpacing: 8.0,
         mainAxisSpacing: 8.0,
@@ -115,7 +129,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
   Widget _createGigTable(BuildContext context, List data) {
     if (data.isEmpty) {
-      return Center(
+      return const Center(
         child: Text(
           "No GIFs found",
           style: TextStyle(color: Colors.white, fontSize: 18.0),
@@ -125,8 +139,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
     return GridView.builder(
       controller: _scrollController,
-      padding: EdgeInsets.all(10.0),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      padding: const EdgeInsets.all(10.0),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 6,
         crossAxisSpacing: 8.0,
         mainAxisSpacing: 8.0,
@@ -148,40 +162,43 @@ class _HomeViewState extends ConsumerState<HomeView> {
           onLongPress: () {
             Share.share(gifUrl);
           },
-          child: Stack(
-            children: [
-              FadeInImage.memoryNetwork(
-                placeholder: kTransparentImage,
-                image: gifUrl,
-                height: 300.0,
-                width: 300.0,
-                fit: BoxFit.cover,
-              ),
-              Positioned(
-                top: 5.0,
-                right: 5.0,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: Icon(Icons.copy, color: Colors.white, size: 20.0),
-                    tooltip: 'Copy Link',
-                    onPressed: () {
-                      Clipboard.setData(ClipboardData(text: gifUrl));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Link copied to clipboard!'),
-                          duration: Duration(seconds: 2),
-                          backgroundColor: Colors.orange,
-                        ),
-                      );
-                    },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12.0),
+            child: Stack(
+              children: [
+                FadeInImage.memoryNetwork(
+                  placeholder: kTransparentImage,
+                  image: gifUrl,
+                  height: 300.0,
+                  width: 300.0,
+                  fit: BoxFit.cover,
+                ),
+                Positioned(
+                  top: 5.0,
+                  right: 5.0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.5),
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.copy, color: Colors.white, size: 20.0),
+                      tooltip: 'Copy Link',
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: gifUrl));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Link copied to clipboard!'),
+                            duration: Duration(seconds: 2),
+                            backgroundColor: Colors.orange,
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -223,7 +240,7 @@ class _SkeletonLoadingState extends State<SkeletonLoading> with SingleTickerProv
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(4.0),
+          borderRadius: BorderRadius.circular(12.0),
         ),
       ),
     );

@@ -1,74 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:share/share.dart';
 
 class GifView extends StatelessWidget {
   final Map _gifData;
 
-  GifView(this._gifData);
-
-  void _showDialog(context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Color(0xff4C4E52),
-          title: new Text(
-            "Share GIF",
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          content: new Text(
-            "This feature is under development!",
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          ),
-          actions: <Widget>[
-            ElevatedButton(
-              child: Text(
-                "Close",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+  const GifView(this._gifData, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final String gifUrl = _gifData['images']['fixed_height']['url'];
+    final String title = _gifData['title'] ?? 'GIF Detail';
+
     return Scaffold(
-      backgroundColor: Color(0xff4C4E52),
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Color(0xff2E3033),
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.orange),
         title: Text(
-          _gifData['title'],
-          style: TextStyle(color: Colors.white),
+          title,
+          style: const TextStyle(color: Colors.white, fontSize: 18.0),
         ),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.share,
-              color: Colors.white,
+              color: Colors.orange,
             ),
             onPressed: () {
-              // Share.share(_gifData['images']['fixed_height']['url']);
-              _showDialog(context);
+              Share.share(gifUrl);
             },
           ),
         ],
       ),
       body: Center(
-        child: Image.network(_gifData['images']['fixed_height']['url']),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20.0),
+            child: Image.network(
+              gifUrl,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
       ),
     );
   }
