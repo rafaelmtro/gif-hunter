@@ -21,8 +21,15 @@
 
 The project follows a standard but strictly organized Flutter directory structure to separate concerns:
 - `lib/main.dart`: Application entry point, theme configuration, and environment initialization.
-- `lib/ui/views/`: Contains the minimalist UI components.
-    - `home.view.dart`: Main search interface with integrated detail modals, favorites sidebar, and tag exploration.
+- `lib/ui/views/`: Contains the minimalist UI components for top-level views.
+    - `home.view.dart`: Main search interface.
+- `lib/ui/components/`: Modular, reusable UI components extracted from views to ensure clean code and better maintainability.
+    - `gif_item.dart`: Individual GIF display with hover effects and actions.
+    - `gif_actions_overlay.dart`: Hover/Overlay actions for GIFs (favorite, copy).
+    - `gif_detail_modal.dart`: Full-screen/Dialog detail view for a specific GIF.
+    - `favorites_modal.dart`: Gallery view for saved GIFs.
+    - `skeleton_loading.dart`: Shimmer effect for initial data fetching.
+    - `trending_tags_sidebar.dart`: Sidebar for browsing trending search terms.
 - `lib/providers/`: State management using Riverpod.
     - `giphy_notifier.dart`: Manages the state of GIF searches, trending, and pagination.
 - `lib/services/`: Data fetching and API integration layers.
@@ -47,6 +54,7 @@ The project follows a standard but strictly organized Flutter directory structur
     - **Debounced "Search-as-you-type":** Instantaneous and fluid search that automatically triggers API fetch after 500ms of user inactivity.
     - **Skeleton Loading States:** Custom shimmer effect in the high-density grid provides better visual feedback that content is specifically "loading" rather than just "missing".
     - **Infinite Scroll with Smart Pre-fetching:** Automatically fetches the next set of results when the user is 80% down the current list, creating an "endless" browsing experience.
+    - **Loading Indicators:** Visual feedback (CircularProgressIndicator) when loading more content during infinite scroll.
     - **One-Tap Copy to Clipboard:** Quick-access "Copy Link" button on grid items with a smooth, in-place "Copied!" overlay for immediate visual confirmation.
     - **Hover-to-Play/Preview:** Grid items show static thumbnails by default, playing animations only on hover (Web) or long-press (Mobile) to reduce visual noise.
     - **GIF Detail Modal:** Clicking a GIF opens a compact, high-fidelity modal displaying the animation, its title (large), and publisher name (medium). Integrated action buttons (heart and copy) allow for direct interaction within the modal.
@@ -66,9 +74,18 @@ This project strictly follows a feature-branch workflow to maintain a stable cod
   - `develop`: The active development branch. All integration of new features and testing happens here.
   - `feature/<feature-name>`: Create a new branch off `develop` for every individual feature or bug fix (e.g., `feature/whatsapp-sharing`).
 
-- **Commit Messages:** We adhere to the **Conventional Commits** pattern to maintain a readable history and allow for automated changelogs.
-  - *Format:* `<type>[optional scope]: <description>`
-  - *Examples:*
+### Project Workflow
+For every update (feature, fix, or adjustment), the following workflow must be followed:
+1.  **Analyze** the requested update and the current state of the codebase.
+2.  **Create** a new branch off `develop` specifically for the update.
+3.  **Implement** and **Commit** the changes following the Conventional Commits pattern.
+4.  **Incorporate** the update into the `develop` branch (via merge or pull request).
+5.  **Delete** the temporary update branch once it has been successfully merged.
+
+### Commit Messages
+We adhere to the **Conventional Commits** pattern to maintain a readable history and allow for automated changelogs.
+- *Format:* `<type>[optional scope]: <description>`
+- *Examples:*
     - `feat(ui): add infinite scrolling to home view`
     - `fix(api): resolve offset pagination bug in Giphy fetch`
     - `chore: update dio dependency to latest stable version`
