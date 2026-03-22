@@ -53,7 +53,7 @@ The project follows a standard but strictly organized Flutter directory structur
     - Interactive elements with clear feedback (e.g., hover states, loading indicators).
     - **Responsive Design (Desktop & Mobile):** Adaptive layout that provides an optimal experience across all screen sizes. 
         - **Adaptive Sidebars:** On Desktop, "Favorites" and "Trending Tags" are displayed as fixed sidebars. On Mobile, they are elegantly moved into a slide-out Navigation Drawer accessed via a hamburger menu.
-        - **Dynamic Grid Layout:** High-density grid automatically adjusts its column count (e.g., 5 columns on Desktop, 2 columns on Mobile) to maintain content density and readability.
+        - **Dynamic Grid Layout:** High-density grid automatically adjusts its column count (e.g., 5 columns on Desktop, 2 columns on Mobile) to maintain content density and readability. On very small screens, GIF items employ optimized action button sizes and increased edge spacing to ensure rounded corners remain visible and buttons don't overlap boundaries.
         - **Fluid Header:** The header collapses on smaller screens, hiding the app name in favor of a full-width search experience with an integrated search icon.
         - **Responsive Modals:** Dialogs (GIF details and favorites) adjust their width, height, and internal padding based on the device's screen dimensions.
     - **Debounced "Search-as-you-type":** Instantaneous and fluid search that automatically triggers API fetch after 500ms of user inactivity.
