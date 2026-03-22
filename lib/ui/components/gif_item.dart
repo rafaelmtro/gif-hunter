@@ -28,9 +28,20 @@ class _HoverableGifItemState extends ConsumerState<HoverableGifItem> {
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onTap: () {
-          showDialog(
-            context: context,
-            builder: (context) => GifDetailModal(gifData: widget.gifData),
+          Navigator.push(
+            context,
+            PageRouteBuilder(
+              opaque: false,
+              barrierDismissible: true,
+              barrierColor: Colors.black.withOpacity(0.5),
+              pageBuilder: (context, _, __) => GifDetailModal(gifData: widget.gifData),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: child,
+                );
+              },
+            ),
           );
         },
         onLongPress: () {
@@ -41,12 +52,15 @@ class _HoverableGifItemState extends ConsumerState<HoverableGifItem> {
           borderRadius: BorderRadius.circular(12.0),
           child: Stack(
             children: [
-              FadeInImage.memoryNetwork(
-                placeholder: kTransparentImage,
-                image: _isHovered ? animatedUrl : staticUrl,
-                height: double.infinity,
-                width: double.infinity,
-                fit: BoxFit.cover,
+              Hero(
+                tag: widget.gifData['id'],
+                child: FadeInImage.memoryNetwork(
+                  placeholder: kTransparentImage,
+                  image: _isHovered ? animatedUrl : staticUrl,
+                  height: double.infinity,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
               ),
               GifActionsOverlay(gifData: widget.gifData),
             ],
