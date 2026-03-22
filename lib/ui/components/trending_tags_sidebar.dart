@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/giphy_notifier.dart';
+import 'skeleton_loading.dart';
 
 class TrendingTagsSidebar extends ConsumerWidget {
   final Function(String) onTagToggled;
@@ -61,7 +62,20 @@ class TrendingTagsSidebar extends ConsumerWidget {
                 }).toList(),
               ),
             ),
-            loading: () => const Center(child: CircularProgressIndicator(color: Colors.orange)),
+            loading: () => SingleChildScrollView(
+              child: Wrap(
+                spacing: 12.0,
+                runSpacing: 8.0,
+                children: List.generate(
+                  15,
+                  (index) => const SkeletonLoading(
+                    width: 80,
+                    height: 24,
+                    borderRadius: 8.0,
+                  ),
+                ),
+              ),
+            ),
             error: (_, __) => const SizedBox.shrink(),
           ),
         ),
