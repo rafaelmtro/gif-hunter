@@ -8,14 +8,19 @@ class FavoritesModal extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final favorites = ref.watch(favoritesProvider);
+    final size = MediaQuery.of(context).size;
+    final isMobile = size.width < 900;
 
     return Dialog(
       backgroundColor: const Color(0xff1A1A1A),
-      insetPadding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 40.0),
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 16.0 : 40.0, 
+        vertical: isMobile ? 16.0 : 40.0
+      ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.0)),
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.8,
-        height: MediaQuery.of(context).size.height * 0.8,
+        width: size.width * (isMobile ? 0.95 : 0.8),
+        height: size.height * (isMobile ? 0.95 : 0.8),
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
@@ -53,8 +58,8 @@ class FavoritesModal extends ConsumerWidget {
                       ),
                     )
                   : GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 5,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: isMobile ? 2 : 5,
                         crossAxisSpacing: 8.0,
                         mainAxisSpacing: 8.0,
                       ),

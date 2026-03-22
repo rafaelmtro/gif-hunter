@@ -11,17 +11,23 @@ class GifDetailModal extends StatelessWidget {
     final String gifUrl = gifData['images']['fixed_height']['url'];
     final String title = gifData['title'] ?? 'GIF Detail';
     final String? username = gifData['user']?['display_name'] ?? gifData['username'];
+    final size = MediaQuery.of(context).size;
+    final isMobile = size.width < 900;
 
     return Dialog(
       backgroundColor: const Color(0xff1A1A1A),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.0)),
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 16.0 : 40.0,
+        vertical: 24.0,
+      ),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: 500.0, 
-          maxHeight: MediaQuery.of(context).size.height * 0.7
+          maxWidth: isMobile ? size.width * 0.9 : 500.0, 
+          maxHeight: size.height * (isMobile ? 0.8 : 0.7)
         ),
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: EdgeInsets.all(isMobile ? 16.0 : 24.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,9 +41,9 @@ class GifDetailModal extends StatelessWidget {
                       children: [
                         Text(
                           title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.orange,
-                            fontSize: 24.0,
+                            fontSize: isMobile ? 20.0 : 24.0,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -46,9 +52,9 @@ class GifDetailModal extends StatelessWidget {
                             padding: const EdgeInsets.only(top: 6.0),
                             child: Text(
                               'Published by: $username',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white70,
-                                fontSize: 18.0,
+                                fontSize: isMobile ? 16.0 : 18.0,
                               ),
                             ),
                           ),

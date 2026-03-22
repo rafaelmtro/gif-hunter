@@ -10,6 +10,8 @@ import '../components/skeleton_loading.dart';
 import '../components/trending_tags_sidebar.dart';
 
 class HomeView extends ConsumerStatefulWidget {
+  const HomeView({Key? key}) : super(key: key);
+
   @override
   _HomeViewState createState() => _HomeViewState();
 }
@@ -17,6 +19,7 @@ class HomeView extends ConsumerStatefulWidget {
 class _HomeViewState extends ConsumerState<HomeView> {
   final _textEditCtrl = TextEditingController();
   final _scrollController = ScrollController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   Timer? _debounce;
 
   @override
@@ -58,34 +61,65 @@ class _HomeViewState extends ConsumerState<HomeView> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(gifsProvider);
+    final size = MediaQuery.of(context).size;
+    final isMobile = size.width < 900;
 
     if (state.search.isEmpty && _textEditCtrl.text.isNotEmpty) {
       _textEditCtrl.clear();
     }
     
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: Colors.black,
+      drawer: isMobile ? Drawer(
+        backgroundColor: const Color(0xff1A1A1A),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildLeftSidebarContent(isDrawer: true),
+                const SizedBox(height: 30.0),
+                Expanded(
+                  child: TrendingTagsSidebar(
+                    onTagToggled: _onTagToggled,
+                    selectedTags: state.selectedTags,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ) : null,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.only(left: 40.0, right: 40.0),
+          padding: EdgeInsets.symmetric(horizontal: isMobile ? 16.0 : 40.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20.0),
-              _buildHeader(),
+              _buildHeader(isMobile),
               const SizedBox(height: 20.0),
               Expanded(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildLeftSidebar(),
-                    const SizedBox(width: 20.0),
-                    _buildMainContent(state),
-                    const SizedBox(width: 40.0),
-                    TrendingTagsSidebar(
-                      onTagToggled: _onTagToggled,
-                      selectedTags: state.selectedTags,
-                    ),
+                    if (!isMobile) ...[
+                      _buildLeftSidebar(),
+                      const SizedBox(width: 20.0),
+                    ],
+                    _buildMainContent(state, isMobile),
+                    if (!isMobile) ...[
+                      const SizedBox(width: 40.0),
+                      SizedBox(
+                        width: 220.0,
+                        child: TrendingTagsSidebar(
+                          onTagToggled: _onTagToggled,
+                          selectedTags: state.selectedTags,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -96,24 +130,29 @@ class _HomeViewState extends ConsumerState<HomeView> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(bool isMobile) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Container(
-          width: 150.0,
-          padding: const EdgeInsets.only(top: 10.0),
-          alignment: Alignment.centerRight,
-          child: const Text(
-            'GIF Hunter',
-            style: TextStyle(
-              color: Colors.orange,
-              fontSize: 24.0,
-              fontWeight: FontWeight.bold,
+        if (isMobile)
+          IconButton(
+            icon: const Icon(Icons.menu, color: Colors.orange),
+            onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+          ),
+        if (!isMobile)
+          Container(
+            width: 150.0,
+            alignment: Alignment.centerRight,
+            child: const Text(
+              'GIF Hunter',
+              style: TextStyle(
+                color: Colors.orange,
+                fontSize: 24.0,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-        ),
-        const SizedBox(width: 20.0),
+        if (!isMobile) const SizedBox(width: 20.0),
         Expanded(
           flex: 2,
           child: TextField(
@@ -135,6 +174,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
               filled: true,
               fillColor: const Color(0xff1A1A1A),
               contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
+              prefixIcon: isMobile ? const Icon(Icons.search, color: Colors.orange) : null,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(30.0),
                 borderSide: BorderSide.none,
@@ -150,7 +190,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
             ),
           ),
         ),
-        const Spacer(flex: 1),
+        if (!isMobile) const Spacer(flex: 1),
       ],
     );
   }
@@ -158,50 +198,60 @@ class _HomeViewState extends ConsumerState<HomeView> {
   Widget _buildLeftSidebar() {
     return SizedBox(
       width: 150.0,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          InkWell(
-            onTap: _showFavorites,
-            borderRadius: BorderRadius.circular(10.0),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 5.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(Icons.favorite, color: Colors.orange, size: 20.0),
-                  SizedBox(width: 10.0),
-                  Text(
+      child: _buildLeftSidebarContent(),
+    );
+  }
+
+  Widget _buildLeftSidebarContent({bool isDrawer = false}) {
+    return Column(
+      crossAxisAlignment: isDrawer ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+      children: [
+        InkWell(
+          onTap: () {
+            if (isDrawer) Navigator.of(context).pop();
+            _showFavorites();
+          },
+          borderRadius: BorderRadius.circular(10.0),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 5.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Icon(Icons.favorite, color: Colors.orange, size: 20.0),
+                SizedBox(width: 10.0),
+                Flexible(
+                  child: Text(
                     'Favorites',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16.0,
                       fontWeight: FontWeight.w500,
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _buildMainContent(GifsState state) {
+  Widget _buildMainContent(GifsState state, bool isMobile) {
     return Expanded(
       flex: 4,
       child: state.isInitialLoading 
-        ? _buildSkeletonGrid()
-        : _buildGifGrid(state),
+        ? _buildSkeletonGrid(isMobile)
+        : _buildGifGrid(state, isMobile),
     );
   }
 
-  Widget _buildSkeletonGrid() {
+  Widget _buildSkeletonGrid(bool isMobile) {
     return GridView.builder(
       padding: const EdgeInsets.all(10.0),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 5,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: isMobile ? 2 : 5,
         crossAxisSpacing: 8.0,
         mainAxisSpacing: 8.0,
       ),
@@ -210,7 +260,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
     );
   }
 
-  Widget _buildGifGrid(GifsState state) {
+  Widget _buildGifGrid(GifsState state, bool isMobile) {
     if (state.gifs.isEmpty) {
       return const Center(
         child: Text(
@@ -226,8 +276,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
           child: GridView.builder(
             controller: _scrollController,
             padding: const EdgeInsets.all(10.0),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 5,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: isMobile ? 2 : 5,
               crossAxisSpacing: 8.0,
               mainAxisSpacing: 8.0,
             ),
