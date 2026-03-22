@@ -25,11 +25,16 @@ class _HomeViewState extends ConsumerState<HomeView> {
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent * 0.8) {
+    _scrollController.addListener(_checkScrollAndLoadMore);
+  }
+
+  void _checkScrollAndLoadMore() {
+    if (_scrollController.hasClients) {
+      final position = _scrollController.position;
+      if (position.pixels >= position.maxScrollExtent * 0.8) {
         ref.read(gifsProvider.notifier).loadMore();
       }
-    });
+    }
   }
 
   void _onSearchChanged(String text) {
@@ -243,14 +248,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
       flex: 4,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          // When screen is resized, check if we need to load more
-          if (_scrollController.hasClients) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent * 0.8) {
-                ref.read(gifsProvider.notifier).loadMore();
-              }
-            });
-          }
+          // Check if we need to load more content to fill the screen (e.g. initial load or resize)
+          WidgetsBinding.instance.addPostFrameCallback((_) => _checkScrollAndLoadMore());
           
           return state.isInitialLoading 
               ? _buildSkeletonGrid(isMobile)
@@ -288,9 +287,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
         Expanded(
           child: NotificationListener<ScrollNotification>(
             onNotification: (ScrollNotification scrollInfo) {
-              if (scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent * 0.8) {
-                ref.read(gifsProvider.notifier).loadMore();
-              }
+              _checkScrollAndLoadMore();
               return false;
             },
             child: GridView.builder(
