@@ -32,11 +32,17 @@ class _GifActionsOverlayState extends ConsumerState<GifActionsOverlay> {
     final favorites = ref.watch(favoritesProvider);
     final bool isFavorite = favorites.any((item) => item['id'] == widget.gifData['id']);
 
+    final size = MediaQuery.of(context).size;
+    final isVerySmall = size.width < 600;
+    
+    final iconSize = isVerySmall ? 16.0 : 20.0;
+    final buttonPadding = isVerySmall ? 4.0 : 8.0;
+
     return Stack(
       children: [
         Positioned(
-          top: 5.0,
-          right: 5.0,
+          top: isVerySmall ? 8.0 : 5.0,
+          right: isVerySmall ? 8.0 : 5.0,
           child: Row(
             children: [
               Container(
@@ -45,10 +51,12 @@ class _GifActionsOverlayState extends ConsumerState<GifActionsOverlay> {
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
+                  padding: EdgeInsets.all(buttonPadding),
+                  constraints: const BoxConstraints(),
                   icon: Icon(
                     isFavorite ? Icons.favorite : Icons.favorite_border,
                     color: isFavorite ? Colors.red : Colors.white,
-                    size: 20.0,
+                    size: iconSize,
                   ),
                   tooltip: isFavorite ? 'Remove from Favorites' : 'Add to Favorites',
                   onPressed: () {
@@ -63,7 +71,9 @@ class _GifActionsOverlayState extends ConsumerState<GifActionsOverlay> {
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
-                  icon: const Icon(Icons.copy, color: Colors.white, size: 20.0),
+                  padding: EdgeInsets.all(buttonPadding),
+                  constraints: const BoxConstraints(),
+                  icon: Icon(Icons.copy, color: Colors.white, size: iconSize),
                   tooltip: 'Copy Link',
                   onPressed: () => _onCopy(animatedUrl),
                 ),
