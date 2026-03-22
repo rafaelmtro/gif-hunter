@@ -80,10 +80,19 @@ class _HomeViewState extends ConsumerState<HomeView> {
         backgroundColor: const Color(0xff1A1A1A),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.menu_open, color: Colors.orange),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
                 _buildLeftSidebarContent(isDrawer: true),
                 const SizedBox(height: 30.0),
                 Expanded(
