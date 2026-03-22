@@ -106,37 +106,46 @@ class _HomeViewState extends ConsumerState<HomeView> {
           ),
         ),
       ) : null,
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: isMobile ? 16.0 : 40.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20.0),
-              _buildHeader(isMobile),
-              const SizedBox(height: 20.0),
-              Expanded(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (!isMobile) ...[
-                      _buildLeftSidebar(),
-                      const SizedBox(width: 20.0),
-                    ],
-                    _buildMainContent(state, isMobile),
-                    if (!isMobile) ...[
-                      const SizedBox(width: 40.0),
-                      SizedBox(
-                        width: 220.0,
-                        child: TrendingTagsSidebar(
-                          onTagToggled: _onTagToggled,
-                          selectedTags: state.selectedTags,
-                        ),
-                      ),
-                    ],
-                  ],
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) => [
+          SliverAppBar(
+            floating: true,
+            snap: true,
+            pinned: false,
+            backgroundColor: Colors.black,
+            expandedHeight: 80.0,
+            collapsedHeight: 60.0,
+            automaticallyImplyLeading: false,
+            flexibleSpace: FlexibleSpaceBar(
+              background: SafeArea(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: isMobile ? 16.0 : 40.0),
+                  child: _buildHeader(isMobile),
                 ),
               ),
+            ),
+          ),
+        ],
+        body: Padding(
+          padding: EdgeInsets.symmetric(horizontal: isMobile ? 16.0 : 40.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (!isMobile) ...[
+                _buildLeftSidebar(),
+                const SizedBox(width: 20.0),
+              ],
+              _buildMainContent(state, isMobile),
+              if (!isMobile) ...[
+                const SizedBox(width: 40.0),
+                SizedBox(
+                  width: 220.0,
+                  child: TrendingTagsSidebar(
+                    onTagToggled: _onTagToggled,
+                    selectedTags: state.selectedTags,
+                  ),
+                ),
+              ],
             ],
           ),
         ),
