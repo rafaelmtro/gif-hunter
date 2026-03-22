@@ -8,8 +8,9 @@ import 'gif_actions_overlay.dart';
 
 class HoverableGifItem extends ConsumerStatefulWidget {
   final Map gifData;
+  final String? heroTagPrefix;
 
-  const HoverableGifItem({Key? key, required this.gifData}) : super(key: key);
+  const HoverableGifItem({Key? key, required this.gifData, this.heroTagPrefix}) : super(key: key);
 
   @override
   _HoverableGifItemState createState() => _HoverableGifItemState();
@@ -22,6 +23,9 @@ class _HoverableGifItemState extends ConsumerState<HoverableGifItem> {
   Widget build(BuildContext context) {
     final String staticUrl = widget.gifData['images']['fixed_height_still']['url'];
     final String animatedUrl = widget.gifData['images']['fixed_height']['url'];
+    final String heroTag = widget.heroTagPrefix != null 
+        ? '${widget.heroTagPrefix}_${widget.gifData['id']}' 
+        : widget.gifData['id'];
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -34,7 +38,10 @@ class _HoverableGifItemState extends ConsumerState<HoverableGifItem> {
               opaque: false,
               barrierDismissible: true,
               barrierColor: Colors.black.withOpacity(0.5),
-              pageBuilder: (context, _, __) => GifDetailModal(gifData: widget.gifData),
+              pageBuilder: (context, _, __) => GifDetailModal(
+                gifData: widget.gifData,
+                heroTag: heroTag,
+              ),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 return FadeTransition(
                   opacity: animation,
@@ -53,7 +60,7 @@ class _HoverableGifItemState extends ConsumerState<HoverableGifItem> {
           child: Stack(
             children: [
               Hero(
-                tag: widget.gifData['id'],
+                tag: heroTag,
                 child: FadeInImage.memoryNetwork(
                   placeholder: kTransparentImage,
                   image: _isHovered ? animatedUrl : staticUrl,

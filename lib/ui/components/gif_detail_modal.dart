@@ -6,8 +6,9 @@ import '../../providers/favorites_notifier.dart';
 
 class GifDetailModal extends ConsumerWidget {
   final Map gifData;
+  final String heroTag;
 
-  const GifDetailModal({Key? key, required this.gifData}) : super(key: key);
+  const GifDetailModal({Key? key, required this.gifData, required this.heroTag}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -111,7 +112,7 @@ class GifDetailModal extends ConsumerWidget {
                     child: Stack(
                       children: [
                         Hero(
-                          tag: gifData['id'],
+                          tag: heroTag,
                           child: Image.network(
                             animatedUrl,
                             fit: BoxFit.contain,

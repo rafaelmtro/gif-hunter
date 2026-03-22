@@ -10,12 +10,13 @@ class GiphyService {
 
   GiphyService({Dio? dio}) : _dio = dio ?? Dio();
 
-  Future<Map<String, dynamic>> getTrending({int limit = 20, String rating = 'g'}) async {
+  Future<Map<String, dynamic>> getTrending({int limit = 20, int offset = 0, String rating = 'g'}) async {
     final response = await _dio.get(
       '$_baseUrl/gifs/trending',
       queryParameters: {
         'api_key': _apiKey,
         'limit': limit,
+        'offset': offset,
         'rating': rating,
       },
     );

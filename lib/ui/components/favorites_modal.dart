@@ -65,7 +65,10 @@ class FavoritesModal extends ConsumerWidget {
                       ),
                       itemCount: favorites.length,
                       itemBuilder: (context, index) {
-                        return HoverableGifItem(gifData: favorites[index]);
+                        return HoverableGifItem(
+                          gifData: favorites[index],
+                          heroTagPrefix: 'fav',
+                        );
                       },
                     ),
             ),

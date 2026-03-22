@@ -59,7 +59,7 @@ class GifsNotifier extends StateNotifier<GifsState> {
       }
 
       if (finalQuery.isEmpty) {
-        data = await _giphyService.getTrending(limit: 20);
+        data = await _giphyService.getTrending(limit: 20, offset: state.offset);
       } else {
         data = await _giphyService.searchGifs(
           query: finalQuery,
@@ -68,8 +68,12 @@ class GifsNotifier extends StateNotifier<GifsState> {
         );
       }
       
+      final List<dynamic> newGifs = data['data'];
+      final Set<String> existingIds = state.gifs.map((g) => g['id'] as String).toSet();
+      final List<dynamic> filteredNewGifs = newGifs.where((g) => !existingIds.contains(g['id'])).toList();
+
       state = state.copyWith(
-        gifs: [...state.gifs, ...data['data']],
+        gifs: [...state.gifs, ...filteredNewGifs],
         offset: state.offset + 20,
         isLoading: false,
         isInitialLoading: false,
@@ -104,8 +108,8 @@ class GifsNotifier extends StateNotifier<GifsState> {
     fetchGifs();
   }
 
-  void loadMore() {
-    fetchGifs();
+  Future<void> loadMore() async {
+    await fetchGifs();
   }
 }
 
