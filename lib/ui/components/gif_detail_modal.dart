@@ -110,9 +110,12 @@ class GifDetailModal extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(16.0),
                     child: Stack(
                       children: [
-                        Image.network(
-                          animatedUrl,
-                          fit: BoxFit.contain,
+                        Hero(
+                          tag: gifData['id'],
+                          child: Image.network(
+                            animatedUrl,
+                            fit: BoxFit.contain,
+                          ),
                         ),
                         Positioned.fill(
                           child: GifActionsOverlay(
