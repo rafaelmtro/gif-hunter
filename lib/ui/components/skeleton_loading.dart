@@ -1,6 +1,17 @@
 import 'package:flutter/material.dart';
 
 class SkeletonLoading extends StatefulWidget {
+  final double? width;
+  final double? height;
+  final double borderRadius;
+
+  const SkeletonLoading({
+    Key? key,
+    this.width,
+    this.height,
+    this.borderRadius = 12.0,
+  }) : super(key: key);
+
   @override
   _SkeletonLoadingState createState() => _SkeletonLoadingState();
 }
@@ -32,9 +43,11 @@ class _SkeletonLoadingState extends State<SkeletonLoading> with SingleTickerProv
     return FadeTransition(
       opacity: _animation,
       child: Container(
+        width: widget.width,
+        height: widget.height,
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12.0),
+          borderRadius: BorderRadius.circular(widget.borderRadius),
         ),
       ),
     );
