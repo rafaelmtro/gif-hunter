@@ -241,9 +241,22 @@ class _HomeViewState extends ConsumerState<HomeView> {
   Widget _buildMainContent(GifsState state, bool isMobile) {
     return Expanded(
       flex: 4,
-      child: state.isInitialLoading 
-        ? _buildSkeletonGrid(isMobile)
-        : _buildGifGrid(state, isMobile),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // When screen is resized, check if we need to load more
+          if (_scrollController.hasClients) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent * 0.8) {
+                ref.read(gifsProvider.notifier).loadMore();
+              }
+            });
+          }
+          
+          return state.isInitialLoading 
+              ? _buildSkeletonGrid(isMobile)
+              : _buildGifGrid(state, isMobile);
+        },
+      ),
     );
   }
 
@@ -273,18 +286,26 @@ class _HomeViewState extends ConsumerState<HomeView> {
     return Column(
       children: [
         Expanded(
-          child: GridView.builder(
-            controller: _scrollController,
-            padding: const EdgeInsets.all(10.0),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: isMobile ? 2 : 5,
-              crossAxisSpacing: 8.0,
-              mainAxisSpacing: 8.0,
-            ),
-            itemCount: state.gifs.length,
-            itemBuilder: (context, index) {
-              return HoverableGifItem(gifData: state.gifs[index]);
+          child: NotificationListener<ScrollNotification>(
+            onNotification: (ScrollNotification scrollInfo) {
+              if (scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent * 0.8) {
+                ref.read(gifsProvider.notifier).loadMore();
+              }
+              return false;
             },
+            child: GridView.builder(
+              controller: _scrollController,
+              padding: const EdgeInsets.all(10.0),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: isMobile ? 2 : 5,
+                crossAxisSpacing: 8.0,
+                mainAxisSpacing: 8.0,
+              ),
+              itemCount: state.gifs.length,
+              itemBuilder: (context, index) {
+                return HoverableGifItem(gifData: state.gifs[index]);
+              },
+            ),
           ),
         ),
         if (state.isLoading)

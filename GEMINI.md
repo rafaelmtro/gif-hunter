@@ -58,7 +58,7 @@ The project follows a standard but strictly organized Flutter directory structur
         - **Responsive Modals:** Dialogs (GIF details and favorites) adjust their width, height, and internal padding based on the device's screen dimensions.
     - **Debounced "Search-as-you-type":** Instantaneous and fluid search that automatically triggers API fetch after 500ms of user inactivity.
     - **Skeleton Loading States:** Custom shimmer effect in the high-density grid provides better visual feedback that content is specifically "loading" rather than just "missing".
-    - **Infinite Scroll with Smart Pre-fetching:** Automatically fetches the next set of results when the user is 80% down the current list, creating an "endless" browsing experience.
+    - **Infinite Scroll with Smart Pre-fetching:** Automatically fetches the next set of results when the user is 80% down the current list, creating an "endless" browsing experience. This strategy is robust and responsive, automatically triggering new fetches if screen resizing (e.g., window expansion on Desktop) reveals more of the feed.
     - **Loading Indicators:** Visual feedback (CircularProgressIndicator) when loading more content during infinite scroll.
     - **One-Tap Copy to Clipboard:** Quick-access "Copy Link" button on grid items with a smooth, in-place "Copied!" overlay for immediate visual confirmation.
     - **Hover-to-Play/Preview:** Grid items show static thumbnails by default, playing animations only on hover (Web) or long-press (Mobile) to reduce visual noise.
