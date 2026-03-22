@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import 'gif_actions_overlay.dart';
+import '../../providers/favorites_notifier.dart';
 
-class GifDetailModal extends StatelessWidget {
+class GifDetailModal extends ConsumerWidget {
   final Map gifData;
 
   const GifDetailModal({Key? key, required this.gifData}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final String gifUrl = gifData['images']['fixed_height']['url'];
+  Widget build(BuildContext context, WidgetRef ref) {
+    final String animatedUrl = gifData['images']['fixed_height']['url'];
     final String fullTitle = gifData['title'] ?? 'GIF Detail';
     
     // Parse title and author
@@ -23,6 +26,9 @@ class GifDetailModal extends StatelessWidget {
     final String? username = gifData['user']?['display_name'] ?? gifData['username'] ?? authorFromTitle;
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 900;
+    
+    final favorites = ref.watch(favoritesProvider);
+    final bool isFavorite = favorites.any((item) => item['id'] == gifData['id']);
 
     return Dialog(
       backgroundColor: const Color(0xff1A1A1A),
@@ -71,9 +77,29 @@ class GifDetailModal extends StatelessWidget {
                       ],
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () => Navigator.of(context).pop(),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: isFavorite ? Colors.red : Colors.white,
+                        ),
+                        onPressed: () {
+                          ref.read(favoritesProvider.notifier).toggleFavorite(Map<String, dynamic>.from(gifData));
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.copy, color: Colors.white),
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(text: animatedUrl));
+                          // The overlay inside the modal will still show the "Copied!" indicator
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.white),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -85,10 +111,15 @@ class GifDetailModal extends StatelessWidget {
                     child: Stack(
                       children: [
                         Image.network(
-                          gifUrl,
+                          animatedUrl,
                           fit: BoxFit.contain,
                         ),
-                        Positioned.fill(child: GifActionsOverlay(gifData: gifData)),
+                        Positioned.fill(
+                          child: GifActionsOverlay(
+                            gifData: gifData,
+                            showOnlyCopiedIndicator: true,
+                          ),
+                        ),
                       ],
                     ),
                   ),
