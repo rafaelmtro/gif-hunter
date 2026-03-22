@@ -8,8 +8,13 @@ import '../../providers/favorites_notifier.dart';
 
 class GifActionsOverlay extends ConsumerStatefulWidget {
   final Map gifData;
+  final bool showOnlyCopiedIndicator;
 
-  const GifActionsOverlay({Key? key, required this.gifData}) : super(key: key);
+  const GifActionsOverlay({
+    Key? key, 
+    required this.gifData,
+    this.showOnlyCopiedIndicator = false,
+  }) : super(key: key);
 
   @override
   _GifActionsOverlayState createState() => _GifActionsOverlayState();
@@ -40,47 +45,48 @@ class _GifActionsOverlayState extends ConsumerState<GifActionsOverlay> {
 
     return Stack(
       children: [
-        Positioned(
-          top: isVerySmall ? 8.0 : 5.0,
-          right: isVerySmall ? 8.0 : 5.0,
-          child: Row(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  padding: EdgeInsets.all(buttonPadding),
-                  constraints: const BoxConstraints(),
-                  icon: Icon(
-                    isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: isFavorite ? Colors.red : Colors.white,
-                    size: iconSize,
+        if (!widget.showOnlyCopiedIndicator)
+          Positioned(
+            top: isVerySmall ? 8.0 : 5.0,
+            right: isVerySmall ? 8.0 : 5.0,
+            child: Row(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    shape: BoxShape.circle,
                   ),
-                  tooltip: isFavorite ? 'Remove from Favorites' : 'Add to Favorites',
-                  onPressed: () {
-                    ref.read(favoritesProvider.notifier).toggleFavorite(Map<String, dynamic>.from(widget.gifData));
-                  },
+                  child: IconButton(
+                    padding: EdgeInsets.all(buttonPadding),
+                    constraints: const BoxConstraints(),
+                    icon: Icon(
+                      isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: isFavorite ? Colors.red : Colors.white,
+                      size: iconSize,
+                    ),
+                    tooltip: isFavorite ? 'Remove from Favorites' : 'Add to Favorites',
+                    onPressed: () {
+                      ref.read(favoritesProvider.notifier).toggleFavorite(Map<String, dynamic>.from(widget.gifData));
+                    },
+                  ),
                 ),
-              ),
-              const SizedBox(width: 5.0),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
-                  shape: BoxShape.circle,
+                const SizedBox(width: 5.0),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    padding: EdgeInsets.all(buttonPadding),
+                    constraints: const BoxConstraints(),
+                    icon: Icon(Icons.copy, color: Colors.white, size: iconSize),
+                    tooltip: 'Copy Link',
+                    onPressed: () => _onCopy(animatedUrl),
+                  ),
                 ),
-                child: IconButton(
-                  padding: EdgeInsets.all(buttonPadding),
-                  constraints: const BoxConstraints(),
-                  icon: Icon(Icons.copy, color: Colors.white, size: iconSize),
-                  tooltip: 'Copy Link',
-                  onPressed: () => _onCopy(animatedUrl),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
         if (_showCopiedIndicator)
           Positioned.fill(
             child: AnimatedOpacity(
