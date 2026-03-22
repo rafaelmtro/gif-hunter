@@ -9,8 +9,18 @@ class GifDetailModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String gifUrl = gifData['images']['fixed_height']['url'];
-    final String title = gifData['title'] ?? 'GIF Detail';
-    final String? username = gifData['user']?['display_name'] ?? gifData['username'];
+    final String fullTitle = gifData['title'] ?? 'GIF Detail';
+    
+    // Parse title and author
+    String title = fullTitle;
+    String? authorFromTitle;
+    if (fullTitle.contains(' by ')) {
+      final parts = fullTitle.split(' by ');
+      title = parts[0];
+      authorFromTitle = parts[1];
+    }
+    
+    final String? username = gifData['user']?['display_name'] ?? gifData['username'] ?? authorFromTitle;
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 900;
 
