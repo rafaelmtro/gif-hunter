@@ -44,8 +44,8 @@ class _HoverableGifItemState extends ConsumerState<HoverableGifItem> {
               FadeInImage.memoryNetwork(
                 placeholder: kTransparentImage,
                 image: _isHovered ? animatedUrl : staticUrl,
-                height: 300.0,
-                width: 300.0,
+                height: double.infinity,
+                width: double.infinity,
                 fit: BoxFit.cover,
               ),
               GifActionsOverlay(gifData: widget.gifData),
