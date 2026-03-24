@@ -229,33 +229,14 @@ class _HomeViewState extends ConsumerState<HomeView> {
     return Column(
       crossAxisAlignment: isDrawer ? CrossAxisAlignment.start : CrossAxisAlignment.end,
       children: [
-        InkWell(
+        _HoverableSidebarButton(
           onTap: () {
             if (isDrawer) Navigator.of(context).pop();
             _showFavorites();
           },
-          borderRadius: BorderRadius.circular(10.0),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 5.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Icon(Icons.favorite, color: Colors.orange, size: 20.0),
-                SizedBox(width: 10.0),
-                Flexible(
-                  child: Text(
-                    'Favorites',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          label: 'Favorites',
+          icon: Icons.favorite,
+          alignment: isDrawer ? MainAxisAlignment.start : MainAxisAlignment.end,
         ),
       ],
     );
@@ -335,6 +316,71 @@ class _HomeViewState extends ConsumerState<HomeView> {
             ),
           ),
       ],
+    );
+  }
+}
+
+class _HoverableSidebarButton extends StatefulWidget {
+  final VoidCallback onTap;
+  final String label;
+  final IconData icon;
+  final MainAxisAlignment alignment;
+
+  const _HoverableSidebarButton({
+    Key? key,
+    required this.onTap,
+    required this.label,
+    required this.icon,
+    required this.alignment,
+  }) : super(key: key);
+
+  @override
+  __HoverableSidebarButtonState createState() => __HoverableSidebarButtonState();
+}
+
+class __HoverableSidebarButtonState extends State<_HoverableSidebarButton> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: InkWell(
+        onTap: widget.onTap,
+        borderRadius: BorderRadius.circular(10.0),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
+          decoration: BoxDecoration(
+            color: _isHovered ? Colors.orange.withOpacity(0.15) : Colors.transparent,
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: widget.alignment,
+            children: [
+              Icon(
+                widget.icon,
+                color: Colors.orange,
+                size: 20.0,
+              ),
+              const SizedBox(width: 10.0),
+              Flexible(
+                child: Text(
+                  widget.label,
+                  style: TextStyle(
+                    color: _isHovered ? Colors.orange : Colors.white,
+                    fontSize: 16.0,
+                    fontWeight: _isHovered ? FontWeight.bold : FontWeight.w500,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
