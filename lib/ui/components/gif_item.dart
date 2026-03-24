@@ -37,6 +37,15 @@ class _HoverableGifItemState extends ConsumerState<HoverableGifItem> with Single
   }
 
   @override
+  void didUpdateWidget(HoverableGifItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If the GIF data changed (e.g. reused state for different GIF), reset scale
+    if (widget.gifData['id'] != oldWidget.gifData['id']) {
+      _scaleController.value = 1.0;
+    }
+  }
+
+  @override
   void dispose() {
     _scaleController.dispose();
     super.dispose();

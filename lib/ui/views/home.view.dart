@@ -318,7 +318,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
               ),
               itemCount: state.gifs.length,
               itemBuilder: (context, index) {
-                return HoverableGifItem(gifData: state.gifs[index]);
+                final gif = state.gifs[index];
+                return HoverableGifItem(
+                  key: ValueKey('home_${gif['id']}'),
+                  gifData: gif,
+                );
               },
             ),
           ),
