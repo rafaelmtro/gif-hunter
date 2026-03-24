@@ -112,8 +112,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
           Container(
             color: Colors.black,
             padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 10.0,
-              bottom: 10.0,
+              top: MediaQuery.of(context).padding.top + 24.0,
+              bottom: 16.0,
               left: isMobile ? 16.0 : 40.0,
               right: isMobile ? 16.0 : 40.0,
             ),
