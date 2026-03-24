@@ -11,12 +11,14 @@ class GifActionsOverlay extends ConsumerStatefulWidget {
   final Map gifData;
   final bool showOnlyCopiedIndicator;
   final double copiedIndicatorIconSize;
+  final VoidCallback? onUnheart;
 
   const GifActionsOverlay({
     Key? key, 
     required this.gifData,
     this.showOnlyCopiedIndicator = false,
     this.copiedIndicatorIconSize = 40.0,
+    this.onUnheart,
   }) : super(key: key);
 
   @override
@@ -81,7 +83,11 @@ class GifActionsOverlayState extends ConsumerState<GifActionsOverlay> {
                         ),
                         tooltip: isFavorite ? 'Remove from Favorites' : 'Add to Favorites',
                         onPressed: () {
-                          ref.read(favoritesProvider.notifier).toggleFavorite(Map<String, dynamic>.from(widget.gifData));
+                          if (isFavorite && widget.onUnheart != null) {
+                            widget.onUnheart!();
+                          } else {
+                            ref.read(favoritesProvider.notifier).toggleFavorite(Map<String, dynamic>.from(widget.gifData));
+                          }
                         },
                       ),
                     ),
