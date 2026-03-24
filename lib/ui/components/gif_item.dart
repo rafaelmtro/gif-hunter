@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share/share.dart';
 import 'package:transparent_image/transparent_image.dart';
 
+import '../../providers/favorites_notifier.dart';
 import 'gif_detail_modal.dart';
 import 'gif_actions_overlay.dart';
 
