@@ -19,6 +19,9 @@ jobs:
           channel: stable
       - run: flutter config --enable-web
       - run: flutter pub get
+      - name: Create .env file
+        run: |
+          echo "GIPHY_API_KEY=${{ secrets.GIPHY_API_KEY }}" > .env
       - run: flutter build web
       - name: Archive Development Artifact
         uses: actions/upload-artifact@v4
