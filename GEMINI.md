@@ -4,7 +4,7 @@
 **Gif Hunter** is a high-performance, Flutter-based web application designed for searching, viewing, and sharing animated GIFs. Leveraging the **Giphy API**, the project focuses on delivering robust results without over-engineering, emphasizing a frictionless user experience.
 
 - **Repository:** `gif-hunter`
-- **Version:** `1.0.0` (Strictly follows **Semantic Versioning**: MAJOR.MINOR.PATCH)
+- **Version:** `2.0.0` (Strictly follows **Semantic Versioning**: MAJOR.MINOR.PATCH)
 
 ### Core Technologies
 - **Framework:** Flutter (Dart) - targeting Web.
