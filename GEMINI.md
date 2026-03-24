@@ -4,7 +4,7 @@
 **Gif Hunter** is a high-performance, Flutter-based web application designed for searching, viewing, and sharing animated GIFs. Leveraging the **Giphy API**, the project focuses on delivering robust results without over-engineering, emphasizing a frictionless user experience.
 
 - **Repository:** `gif-hunter`
-- **Version:** `2.0.0` (Strictly follows **Semantic Versioning**: MAJOR.MINOR.PATCH)
+- **Version:** `2.0.1` (Strictly follows **Semantic Versioning**: MAJOR.MINOR.PATCH)
 
 ### Core Technologies
 - **Framework:** Flutter (Dart) - targeting Web.
@@ -12,7 +12,7 @@
 - **State Management:** **Riverpod** (`flutter_riverpod`) with `StateNotifier` for clean, scalable state handling, separating UI from business logic.
 - **Sharing:** `share` package for social media integration (Telegram, Facebook, WhatsApp).
 - **Image Handling:** `transparent_image` for smooth, optimized loading transitions.
-- **CI/CD:** GitHub Actions for automated web builds and deployment to GitHub Pages.
+- **CI/CD:** GitHub Actions for automated web builds and deployment to GitHub Pages. Uses latest stable versions of `actions/checkout@v4`, `actions/upload-artifact@v4`, and `actions/download-artifact@v4` to ensure reliable builds and avoid deprecation failures.
 - **Containerization:** Docker for a consistent, isolated local development environment.
 
 ---
@@ -38,6 +38,7 @@ The project follows a standard but strictly organized Flutter directory structur
 
 **Environment Configuration & Security:**
 - All sensitive information (e.g., the Giphy API key) and environment-specific variables **MUST** be stored in a `.env` file at the root of the project.
+- **Implementation:** The project uses `flutter_dotenv` to load environment variables at runtime. Initialization is performed in `main.dart` before `runApp()`.
 - **Security Rule:** NEVER commit `.env` files to version control. Always maintain an up-to-date `.env.example` file for new developers.
 - **Git Authentication:** Use SSH keys for all GitHub operations. The keys are located at `~/.config/ssh/`. Ensure your local git configuration is set to use these keys.
 

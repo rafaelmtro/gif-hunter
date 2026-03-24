@@ -117,8 +117,11 @@ unlinked_spec.ds
 **/linux/flutter/generated_plugin_registrant.h
 **/linux/flutter/generated_plugins.cmake
 
-# Coverage
+# coverage
 coverage/
+
+# .env
+.env
 
 # Symbols
 app.*.symbols

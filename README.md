@@ -18,10 +18,8 @@
 ### 💖 Personalization & Sharing
 - **Favorites Gallery:** Save your favorite GIFs locally (`shared_preferences`) for quick access.
 - **One-Tap Copy:** Quick-access "Copy Link" with visual "Copied!" feedback.
-- **Social Integration:** Share directly to Telegram, Facebook, and WhatsApp.
 
-### 🎨 Premium UI/UX
-- **Modern Minimalist Design:** Sleek Orange & Black theme with rounded, fluid shapes.
+### 🎨 UI/UX
 - **Hero Animations:** Smooth transitions from grid items to full-screen detail views.
 - **Animated Feedback:** Scale-down effects for unhearting and smooth hover states across the UI.
 - **Responsive Layout:** Adaptive design that feels native on both Desktop and Mobile.
@@ -89,7 +87,7 @@ docker run -p 8080:8080 -v $(pwd):/app -it gif-hunter-dev
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
-## 👤 Author
+## Author
 
 **Rafael Monteiro**
 - GitHub: [@rafaelmtro](https://github.com/rafaelmtro)

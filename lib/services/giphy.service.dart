@@ -1,11 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final giphyServiceProvider = Provider((ref) => GiphyService());
 
 class GiphyService {
   final Dio _dio;
-  static const String _apiKey = 'nFpRCivJ74jdZjHMPgp2qsKDobPWhE4e';
+  static final String _apiKey = dotenv.get('GIPHY_API_KEY');
   static const String _baseUrl = 'https://api.giphy.com/v1';
 
   GiphyService({Dio? dio}) : _dio = dio ?? Dio();
