@@ -12,7 +12,7 @@
 - **State Management:** **Riverpod** (`flutter_riverpod`) with `StateNotifier` for clean, scalable state handling, separating UI from business logic.
 - **Sharing:** `share` package for social media integration (Telegram, Facebook, WhatsApp).
 - **Image Handling:** `transparent_image` for smooth, optimized loading transitions.
-- **CI/CD:** GitHub Actions for automated web builds and deployment to GitHub Pages.
+- **CI/CD:** GitHub Actions for automated web builds and deployment to GitHub Pages. Uses latest stable versions of `actions/checkout@v4`, `actions/upload-artifact@v4`, and `actions/download-artifact@v4` to ensure reliable builds and avoid deprecation failures.
 - **Containerization:** Docker for a consistent, isolated local development environment.
 
 ---
