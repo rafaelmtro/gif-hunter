@@ -23,17 +23,8 @@ class _GifDetailModalState extends ConsumerState<GifDetailModal> {
     super.initState();
     // Use addPostFrameCallback to avoid setting state during build
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(isModalOpenProvider.notifier).state = true;
+      ref.read(openGifIdProvider.notifier).state = widget.gifData['id'];
     });
-  }
-
-  @override
-  void dispose() {
-    // When the modal is closed, reset the state
-    // Note: Since this is inside the modal itself, it's safer to use this here.
-    // However, the provider should be set to false when the modal is dismissed.
-    // A better approach might be to set it to false when the route is popped.
-    super.dispose();
   }
 
   @override
@@ -60,7 +51,7 @@ class _GifDetailModalState extends ConsumerState<GifDetailModal> {
 
     return WillPopScope(
       onWillPop: () async {
-        ref.read(isModalOpenProvider.notifier).state = false;
+        ref.read(openGifIdProvider.notifier).state = null;
         return true;
       },
       child: Dialog(
@@ -133,7 +124,7 @@ class _GifDetailModalState extends ConsumerState<GifDetailModal> {
                         IconButton(
                           icon: const Icon(Icons.close, color: Colors.white),
                           onPressed: () {
-                            ref.read(isModalOpenProvider.notifier).state = false;
+                            ref.read(openGifIdProvider.notifier).state = null;
                             Navigator.of(context).pop();
                           },
                         ),

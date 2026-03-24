@@ -43,8 +43,9 @@ class GifActionsOverlayState extends ConsumerState<GifActionsOverlay> {
   Widget build(BuildContext context) {
     final String animatedUrl = widget.gifData['images']['fixed_height']['url'];
     final favorites = ref.watch(favoritesProvider);
-    final isModalOpen = ref.watch(isModalOpenProvider);
+    final openGifId = ref.watch(openGifIdProvider);
     final bool isFavorite = favorites.any((item) => item['id'] == widget.gifData['id']);
+    final bool isThisGifOpen = openGifId == widget.gifData['id'];
 
     final size = MediaQuery.of(context).size;
     final isVerySmall = size.width < 600;
@@ -60,9 +61,9 @@ class GifActionsOverlayState extends ConsumerState<GifActionsOverlay> {
             right: isVerySmall ? 8.0 : 5.0,
             child: AnimatedOpacity(
               duration: const Duration(milliseconds: 200),
-              opacity: isModalOpen ? 0.0 : 1.0,
+              opacity: isThisGifOpen ? 0.0 : 1.0,
               child: IgnorePointer(
-                ignoring: isModalOpen,
+                ignoring: isThisGifOpen,
                 child: Row(
                   children: [
                     Container(
