@@ -52,6 +52,7 @@ class GifDetailModal extends ConsumerWidget {
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     child: Column(
@@ -59,6 +60,8 @@ class GifDetailModal extends ConsumerWidget {
                       children: [
                         Text(
                           title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             color: Colors.orange,
                             fontSize: isMobile ? 20.0 : 24.0,
