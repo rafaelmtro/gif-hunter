@@ -13,6 +13,7 @@ class GifDetailModal extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final String animatedUrl = gifData['images']['fixed_height']['url'];
+    final String staticUrl = gifData['images']['fixed_height_still']['url'];
     final String fullTitle = gifData['title'] ?? 'GIF Detail';
     
     // Parse title and author
@@ -116,6 +117,21 @@ class GifDetailModal extends ConsumerWidget {
                           child: Image.network(
                             animatedUrl,
                             fit: BoxFit.contain,
+                            gaplessPlayback: true,
+                            frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                              if (wasSynchronouslyLoaded) return child;
+                              return AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 200),
+                                child: frame != null
+                                    ? child
+                                    : Image.network(
+                                        staticUrl,
+                                        fit: BoxFit.contain,
+                                        gaplessPlayback: true,
+                                        key: const ValueKey('static'),
+                                      ),
+                              );
+                            },
                           ),
                         ),
                         Positioned.fill(
