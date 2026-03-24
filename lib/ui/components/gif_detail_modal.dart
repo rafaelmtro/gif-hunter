@@ -7,8 +7,9 @@ import '../../providers/favorites_notifier.dart';
 class GifDetailModal extends ConsumerWidget {
   final Map gifData;
   final String heroTag;
+  final GlobalKey<GifActionsOverlayState> _overlayKey = GlobalKey<GifActionsOverlayState>();
 
-  const GifDetailModal({Key? key, required this.gifData, required this.heroTag}) : super(key: key);
+  GifDetailModal({Key? key, required this.gifData, required this.heroTag}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -96,8 +97,7 @@ class GifDetailModal extends ConsumerWidget {
                       IconButton(
                         icon: const Icon(Icons.copy, color: Colors.white),
                         onPressed: () {
-                          Clipboard.setData(ClipboardData(text: animatedUrl));
-                          // The overlay inside the modal will still show the "Copied!" indicator
+                          _overlayKey.currentState?.triggerCopy();
                         },
                       ),
                       IconButton(
@@ -139,8 +139,10 @@ class GifDetailModal extends ConsumerWidget {
                         ),
                         Positioned.fill(
                           child: GifActionsOverlay(
+                            key: _overlayKey,
                             gifData: gifData,
                             showOnlyCopiedIndicator: true,
+                            copiedIndicatorIconSize: 60.0,
                           ),
                         ),
                       ],

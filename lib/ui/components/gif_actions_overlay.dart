@@ -9,19 +9,26 @@ import '../../providers/favorites_notifier.dart';
 class GifActionsOverlay extends ConsumerStatefulWidget {
   final Map gifData;
   final bool showOnlyCopiedIndicator;
+  final double copiedIndicatorIconSize;
 
   const GifActionsOverlay({
     Key? key, 
     required this.gifData,
     this.showOnlyCopiedIndicator = false,
+    this.copiedIndicatorIconSize = 40.0,
   }) : super(key: key);
 
   @override
-  _GifActionsOverlayState createState() => _GifActionsOverlayState();
+  GifActionsOverlayState createState() => GifActionsOverlayState();
 }
 
-class _GifActionsOverlayState extends ConsumerState<GifActionsOverlay> {
+class GifActionsOverlayState extends ConsumerState<GifActionsOverlay> {
   bool _showCopiedIndicator = false;
+
+  void triggerCopy() {
+    final String animatedUrl = widget.gifData['images']['fixed_height']['url'];
+    _onCopy(animatedUrl);
+  }
 
   void _onCopy(String animatedUrl) {
     Clipboard.setData(ClipboardData(text: animatedUrl));
@@ -97,10 +104,10 @@ class _GifActionsOverlayState extends ConsumerState<GifActionsOverlay> {
                 child: Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(Icons.check_circle, color: Colors.orange, size: 40.0),
-                      SizedBox(height: 8.0),
-                      Text(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.orange, size: widget.copiedIndicatorIconSize),
+                      const SizedBox(height: 8.0),
+                      const Text(
                         'Copied!',
                         style: TextStyle(
                           color: Colors.white,
