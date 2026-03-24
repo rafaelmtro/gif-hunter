@@ -38,6 +38,7 @@ The project follows a standard but strictly organized Flutter directory structur
 
 **Environment Configuration & Security:**
 - All sensitive information (e.g., the Giphy API key) and environment-specific variables **MUST** be stored in a `.env` file at the root of the project.
+- **Implementation:** The project uses `flutter_dotenv` to load environment variables at runtime. Initialization is performed in `main.dart` before `runApp()`.
 - **Security Rule:** NEVER commit `.env` files to version control. Always maintain an up-to-date `.env.example` file for new developers.
 - **Git Authentication:** Use SSH keys for all GitHub operations. The keys are located at `~/.config/ssh/`. Ensure your local git configuration is set to use these keys.
 
