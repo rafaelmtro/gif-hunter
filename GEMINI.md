@@ -12,7 +12,7 @@
 - **State Management:** **Riverpod** (`flutter_riverpod`) with `StateNotifier` for clean, scalable state handling, separating UI from business logic.
 - **Sharing:** `share` package for social media integration (Telegram, Facebook, WhatsApp).
 - **Image Handling:** `transparent_image` for smooth, optimized loading transitions.
-- **CI/CD:** GitHub Actions for automated web builds and deployment to GitHub Pages. Uses latest stable versions of `actions/checkout@v4`, `actions/upload-artifact@v4`, and `actions/download-artifact@v4` to ensure reliable builds. The CI pipeline includes a step to **dynamically create the `.env` file** from GitHub Secrets (e.g., `GIPHY_API_KEY`) to prevent build failures due to missing environment assets.
+- **CI/CD:** GitHub Actions for automated web builds and deployment to GitHub Pages. Uses latest stable versions of `actions/checkout@v4`, `actions/upload-artifact@v4`, and `actions/download-artifact@v4` to ensure reliable builds. The CI pipeline includes a step to **dynamically create the `.env` file** from **GitHub Secrets** (e.g., `GIPHY_API_KEY`, `GIF_HUNTER_CI`) to prevent build failures due to missing environment assets.
 - **Containerization:** Docker for a consistent, isolated local development environment.
 
 ---
@@ -40,6 +40,9 @@ The project follows a standard but strictly organized Flutter directory structur
 - All sensitive information (e.g., the Giphy API key) and environment-specific variables **MUST** be stored in a `.env` file at the root of the project.
 - **Implementation:** The project uses `flutter_dotenv` to load environment variables at runtime. Initialization is performed in `main.dart` before `runApp()`.
 - **Security Rule:** NEVER commit `.env` files to version control. Always maintain an up-to-date `.env.example` file for new developers.
+- **Secrets Management:** Project secrets are robustly managed across two environments:
+    - **GitHub Secrets:** Used by GitHub Actions to dynamically generate the `.env` file during the CI/CD pipeline, ensuring that builds remain secure and functional without sensitive data being checked into the repository. This includes critical secrets like `GIPHY_API_KEY` and `GIF_HUNTER_CI`.
+    - **Local .env:** Used for local development to provide the necessary keys for API integration without exposing them in the codebase.
 - **Git Authentication:** Use SSH keys for all GitHub operations. The keys are located at `~/.config/ssh/`. Ensure your local git configuration is set to use these keys.
 
 ---
