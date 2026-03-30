@@ -1,16 +1,16 @@
 # GEMINI.md
 
 ## Project Overview
-**Gif Hunter** is a high-performance, full-stack application designed for searching, viewing, and sharing animated GIFs. It is organized as a **monorepo** consisting of a Flutter-based web frontend and a FastAPI-based backend proxying the **Giphy API**.
+**Gif Hunter** is a high-performance, full-stack application designed for searching, viewing, and sharing animated GIFs. It is organized as a **monorepo** consisting of a SwiftWasm-based web frontend and a FastAPI-based backend proxying the **Giphy API**.
 
 - **Repository:** `gif-hunter`
-- **Version:** `2.0.1` (Strictly follows **Semantic Versioning**: MAJOR.MINOR.PATCH)
+- **Version:** `3.0.0` (Strictly follows **Semantic Versioning**: MAJOR.MINOR.PATCH)
 
 ### Core Technologies
-- **Frontend:** Flutter (Dart) - targeting Web.
+- **Frontend:** Swift (SwiftWasm) with Tokamak - targeting Web.
 - **Backend:** Python (FastAPI) - acts as a proxy to the Giphy API.
-- **HTTP Client:** `dio` (Frontend) and `httpx` (Backend).
-- **State Management:** **Riverpod** (`flutter_riverpod`) on the frontend.
+- **HTTP Client:** `URLSession` via `JavaScriptKit` (Frontend) and `httpx` (Backend).
+- **State Management:** Swift `@StateObject`, `@Published`, and `@EnvironmentObject` on the frontend.
 - **Containerization:** **Docker Compose** for orchestrating frontend and backend services.
 - **CI/CD:** GitHub Actions for automated builds and deployment.
 
@@ -21,10 +21,10 @@
 The project is divided into two main service directories:
 
 ### 1. Frontend (`/frontend`)
-The Flutter web application providing the user interface.
-- `lib/services/giphy.service.dart`: Now communicates with the internal FastAPI backend instead of Giphy directly.
-- `lib/ui/`: Contains all reusable UI components and views.
-- **Environment:** Requires `BACKEND_URL` to point to the FastAPI service.
+The SwiftWasm web application providing the user interface.
+- Built using Swift Package Manager (`Package.swift`).
+- Communicates with the internal FastAPI backend instead of Giphy directly.
+- **Environment:** Configured to point to the FastAPI service (e.g., via backend URL).
 
 ### 2. Backend (`/backend`)
 A Python FastAPI application that handles Giphy API interactions.
@@ -45,7 +45,7 @@ A Python FastAPI application that handles Giphy API interactions.
 ---
 
 ## UI/UX & Design Guidelines
-*(Design guidelines remain consistent with version 2.0.1, focusing on minimalist Orange and Black theme, responsive grid, and smooth transitions.)*
+*(Design guidelines focus on a minimalist Orange and Black theme, responsive grid, and smooth transitions, now implemented via Tokamak and CSS injection.)*
 
 ---
 
@@ -74,7 +74,7 @@ uvicorn main:app --reload
 **Frontend:**
 ```bash
 cd frontend
-flutter run -d chrome
+carton dev
 ```
 
 ---
@@ -84,8 +84,8 @@ flutter run -d chrome
 ### Version Control & Git Strategy
 - **Branching:** `master` for production, `develop` for integration.
 - **Features:** `feature/<name>` branched from `develop`.
-- **Commit Messages:** Follow **Conventional Commits** (e.g., `feat(backend): add proxy for trending gifs`).
+- **Commit Messages:** Follow **Conventional Commits** (e.g., `feat(frontend): port to SwiftWasm`).
 
 ### Testing
 - **Backend Tests:** Run `pytest` in the `/backend` directory.
-- **Frontend Tests:** Run `flutter test` in the `/frontend` directory.
+- **Frontend Tests:** Run `swift test` in the `/frontend` directory.
