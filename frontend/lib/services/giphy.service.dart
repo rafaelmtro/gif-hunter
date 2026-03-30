@@ -6,8 +6,7 @@ final giphyServiceProvider = Provider((ref) => GiphyService());
 
 class GiphyService {
   final Dio _dio;
-  static final String _apiKey = dotenv.get('GIPHY_API_KEY');
-  static const String _baseUrl = 'https://api.giphy.com/v1';
+  static final String _baseUrl = dotenv.get('BACKEND_URL', fallback: 'http://localhost:8000');
 
   GiphyService({Dio? dio}) : _dio = dio ?? Dio();
 
@@ -15,7 +14,6 @@ class GiphyService {
     final response = await _dio.get(
       '$_baseUrl/gifs/trending',
       queryParameters: {
-        'api_key': _apiKey,
         'limit': limit,
         'offset': offset,
         'rating': rating,
@@ -34,7 +32,6 @@ class GiphyService {
     final response = await _dio.get(
       '$_baseUrl/gifs/search',
       queryParameters: {
-        'api_key': _apiKey,
         'q': query,
         'limit': limit,
         'offset': offset,
@@ -48,9 +45,6 @@ class GiphyService {
   Future<List<String>> getTrendingSearches() async {
     final response = await _dio.get(
       '$_baseUrl/trending/searches',
-      queryParameters: {
-        'api_key': _apiKey,
-      },
     );
     return List<String>.from(response.data['data']);
   }

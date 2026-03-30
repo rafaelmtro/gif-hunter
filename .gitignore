@@ -123,6 +123,12 @@ coverage/
 # .env
 .env
 
+# Backend
+backend/__pycache__/
+backend/venv/
+backend/.pytest_cache/
+backend/*.pyc
+
 # Symbols
 app.*.symbols
 
