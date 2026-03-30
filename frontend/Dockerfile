@@ -1,16 +1,21 @@
-FROM ghcr.io/cirruslabs/flutter:stable
+# Build Stage
+FROM swiftwasm/swift:5.9-focal as builder
 
-# Set the working directory
 WORKDIR /app
-
-# Copy the project files
 COPY . .
 
-# Ensure dependencies are fetched
-RUN flutter pub get
+# Install carton
+RUN npm install -g @swiftwasm/carton
 
-# Expose the web server port
-EXPOSE 8080
+# Build the release Wasm bundle
+RUN carton bundle --release
 
-# Start the Flutter web server binding to 0.0.0.0 to allow external access
-CMD ["flutter", "run", "-d", "web-server", "--web-hostname", "0.0.0.0", "--web-port", "8080"]
+# Optimize the wasm binary (optional, requires wasm-opt which might be in the image or needs installation)
+# RUN apt-get update && apt-get install -y binaryen && wasm-opt -O3 Bundle/main.wasm -o Bundle/main.wasm
+
+# Runtime Stage
+FROM nginx:alpine
+COPY --from=builder /app/Bundle /usr/share/nginx/html
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
