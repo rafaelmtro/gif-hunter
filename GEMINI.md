@@ -74,7 +74,7 @@ uvicorn main:app --reload
 **Frontend:**
 ```bash
 cd frontend
-carton dev
+swift run carton dev
 ```
 
 ---

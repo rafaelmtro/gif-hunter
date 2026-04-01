@@ -9,7 +9,8 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/TokamakUI/Tokamak", from: "0.11.0"),
-        .package(url: "https://github.com/swiftwasm/JavaScriptKit", from: "0.18.0")
+        .package(url: "https://github.com/swiftwasm/JavaScriptKit", from: "0.18.0"),
+        .package(url: "https://github.com/swiftwasm/carton", from: "1.0.0")
     ],
     targets: [
         .executableTarget(

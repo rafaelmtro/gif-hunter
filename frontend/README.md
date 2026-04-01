@@ -14,24 +14,20 @@ A WebAssembly frontend built with Swift and Tokamak. This replaces the legacy Fl
 
 ## Setup
 
-1. Install Carton globally via npm:
+1. Build and run locally using the Carton SwiftPM plugin:
    ```bash
-   npm install -g @swiftwasm/carton
-   ```
-
-2. Build and run locally:
-   ```bash
-   carton dev
+   cd frontend
+   swift run carton dev
    ```
    The development server will run at `http://127.0.0.1:8080`.
 
 ## Testing
 Run unit tests using the standard Swift package manager:
 ```bash
-swift test
+swift run carton test
 ```
 
 ## Docker Deployment
 The `Dockerfile` employs a multi-stage build:
-1. Compiles the Swift code into an optimized `.wasm` binary using `carton bundle`.
+1. Compiles and bundles the Swift code into an optimized `.wasm` binary using `swift run carton bundle --release`.
 2. Serves the static assets via a lightweight `nginx:alpine` image.
