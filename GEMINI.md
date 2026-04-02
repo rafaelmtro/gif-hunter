@@ -23,8 +23,10 @@ The project is divided into two main service directories:
 ### 1. Frontend (`/frontend`)
 The SwiftWasm web application providing the user interface.
 - Built using Swift Package Manager (`Package.swift`).
-- Communicates with the internal FastAPI backend instead of Giphy directly.
-- **Environment:** Configured to point to the FastAPI service (e.g., via backend URL).
+- `Sources/GifHunter/GifHunterApp.swift`: Entry point using `@main` (no top-level code in `main.swift` allowed).
+- `Sources/GifHunter/ContentView.swift`: Main view using Tokamak and JavaScriptKit for API interactions.
+- **Async Handling**: Uses `JSClosure` to bridge Swift closures with JavaScript Promises.
+- **Environment**: Configured to point to the FastAPI service (e.g., via backend URL).
 
 ### 2. Backend (`/backend`)
 A Python FastAPI application that handles Giphy API interactions.

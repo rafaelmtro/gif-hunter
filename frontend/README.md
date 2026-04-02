@@ -12,6 +12,10 @@ A WebAssembly frontend built with Swift and Tokamak. This replaces the legacy Fl
 - [Swift 5.9 Toolchain](https://www.swift.org/download/)
 - [Node.js](https://nodejs.org/) (for Carton)
 
+## Architecture
+- `Sources/GifHunter/GifHunterApp.swift`: Main entry point using `@main`. No top-level code in `main.swift` is used to avoid compiler conflicts.
+- `Sources/GifHunter/ContentView.swift`: Main view implementing searching and trending functionality. Uses `JSClosure` for asynchronous callback handling.
+
 ## Setup
 
 1. Build and run locally using the Carton SwiftPM plugin:
@@ -29,5 +33,6 @@ swift run carton test
 
 ## Docker Deployment
 The `Dockerfile` employs a multi-stage build:
-1. Compiles and bundles the Swift code into an optimized `.wasm` binary using `swift run carton bundle --release`.
-2. Serves the static assets via a lightweight `nginx:alpine` image.
+1. Resolves and caches SwiftPM dependencies using `swift package resolve`.
+2. Compiles and bundles the Swift code into an optimized `.wasm` binary using `swift run carton bundle --release`.
+3. Serves the static assets via a lightweight `nginx:alpine` image.
