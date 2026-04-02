@@ -1,16 +1,24 @@
 # Build Stage
 FROM ghcr.io/swiftwasm/swift:5.10-jammy AS builder
 
-WORKDIR /app
-COPY . .
+# Install Node/NPM for Carton (if needed by carton plugin for dev server/bundling)
+RUN apt-get update && apt-get install -y \
+    curl gnupg && \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
 
-# Build and bundle the release Wasm application using the Carton plugin
+WORKDIR /app
+COPY Package.swift .
+# Resolve dependencies early to cache them
+RUN swift package resolve 
+
+COPY . .
+# Use the carton SwiftPM plugin to bundle the release
 RUN swift run carton bundle --release
 
 # Runtime Stage
 FROM nginx:alpine
-# Copy the bundled assets from the build stage (usually in Bundle directory)
 COPY --from=builder /app/Bundle /usr/share/nginx/html
 EXPOSE 80
-
 CMD ["nginx", "-g", "daemon off;"]
