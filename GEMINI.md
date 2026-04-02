@@ -23,9 +23,10 @@ The project is divided into two main service directories:
 ### 1. Frontend (`/frontend`)
 The SwiftWasm web application providing the user interface.
 - Built using Swift Package Manager (`Package.swift`).
-- `Sources/GifHunter/GifHunterApp.swift`: Entry point using `@main` (no top-level code in `main.swift` allowed).
-- `Sources/GifHunter/ContentView.swift`: Main view using Tokamak and JavaScriptKit for API interactions.
-- **Async Handling**: Uses `JSClosure` to bridge Swift closures with JavaScript Promises.
+- `Sources/GifHunter/GifHunterApp.swift`: Entry point using `@main`.
+- `Sources/GifHunter/ContentView.swift`: Main view using Tokamak and JavaScriptKit.
+- **Async Handling**: Uses `JSClosure` with explicit `[JSValue]` argument handling to bridge Swift closures with JavaScript Promises.
+- **System Dependencies**: Requires `libgtk-3-dev` in the build environment for stabilization.
 - **Environment**: Configured to point to the FastAPI service (e.g., via backend URL).
 
 ### 2. Backend (`/backend`)

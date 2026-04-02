@@ -67,15 +67,18 @@ class GifViewModel: ObservableObject {
         let jsFetch = JSObject.global.fetch.function!
         let url = "\(backendURL)/gifs/trending"
         
-        _ = jsFetch(url).then(JSClosure { response in
+        _ = jsFetch(url).then(JSClosure { args in
+            let response = args[0].object!
             return response.json!()
-        }).then(JSClosure { data in
+        }).then(JSClosure { args in
+            let data = args[0]
             self.parseGifs(from: data)
             DispatchQueue.main.async {
                 self.isLoading = false
             }
             return .undefined
-        }).catch(JSClosure { error in
+        }).catch(JSClosure { args in
+            let error = args[0]
             print("Error fetching trending: \(error)")
             DispatchQueue.main.async {
                 self.isLoading = false
@@ -90,15 +93,18 @@ class GifViewModel: ObservableObject {
         let jsFetch = JSObject.global.fetch.function!
         let url = "\(backendURL)/gifs/search?q=\(searchQuery)"
         
-        _ = jsFetch(url).then(JSClosure { response in
+        _ = jsFetch(url).then(JSClosure { args in
+            let response = args[0].object!
             return response.json!()
-        }).then(JSClosure { data in
+        }).then(JSClosure { args in
+            let data = args[0]
             self.parseGifs(from: data)
             DispatchQueue.main.async {
                 self.isLoading = false
             }
             return .undefined
-        }).catch(JSClosure { error in
+        }).catch(JSClosure { args in
+            let error = args[0]
             print("Error searching: \(error)")
             DispatchQueue.main.async {
                 self.isLoading = false

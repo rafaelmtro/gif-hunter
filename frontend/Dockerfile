@@ -1,9 +1,9 @@
 # Build Stage
 FROM ghcr.io/swiftwasm/swift:5.10-jammy AS builder
 
-# Install Node/NPM for Carton (if needed by carton plugin for dev server/bundling)
+# Install Node/NPM and system dependencies for Carton/SwiftWasm
 RUN apt-get update && apt-get install -y \
-    curl gnupg && \
+    curl gnupg libgtk-3-dev && \
     curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs && \
     rm -rf /var/lib/apt/lists/*
