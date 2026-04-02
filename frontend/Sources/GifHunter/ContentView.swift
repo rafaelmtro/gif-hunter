@@ -1,5 +1,6 @@
 import TokamakDOM
 import JavaScriptKit
+import Foundation
 
 struct ContentView: View {
     @StateObject var viewModel = GifViewModel()
@@ -59,24 +60,28 @@ class GifViewModel: ObservableObject {
     @Published var searchQuery: String = ""
     @Published var isLoading: Bool = false
     
-    let backendURL = "http://localhost:8000"
+    let backendURL = "http://backend:8000"
     
     func fetchTrending() {
         isLoading = true
         let jsFetch = JSObject.global.fetch.function!
         let url = "\(backendURL)/gifs/trending"
         
-        _ = jsFetch(url).then { response -> JSValue in
-            return response.object!.json!().object!
-        }.then { data -> JSValue in
+        _ = jsFetch(url).then(JSClosure { response in
+            return response.json!()
+        }).then(JSClosure { data in
             self.parseGifs(from: data)
-            self.isLoading = false
-            return JSValue.undefined
-        }.catch { error -> JSValue in
+            DispatchQueue.main.async {
+                self.isLoading = false
+            }
+            return .undefined
+        }).catch(JSClosure { error in
             print("Error fetching trending: \(error)")
-            self.isLoading = false
-            return JSValue.undefined
-        }
+            DispatchQueue.main.async {
+                self.isLoading = false
+            }
+            return .undefined
+        })
     }
     
     func searchGifs() {
@@ -85,28 +90,32 @@ class GifViewModel: ObservableObject {
         let jsFetch = JSObject.global.fetch.function!
         let url = "\(backendURL)/gifs/search?q=\(searchQuery)"
         
-        _ = jsFetch(url).then { response -> JSValue in
-            return response.object!.json!().object!
-        }.then { data -> JSValue in
+        _ = jsFetch(url).then(JSClosure { response in
+            return response.json!()
+        }).then(JSClosure { data in
             self.parseGifs(from: data)
-            self.isLoading = false
-            return JSValue.undefined
-        }.catch { error -> JSValue in
+            DispatchQueue.main.async {
+                self.isLoading = false
+            }
+            return .undefined
+        }).catch(JSClosure { error in
             print("Error searching: \(error)")
-            self.isLoading = false
-            return JSValue.undefined
-        }
+            DispatchQueue.main.async {
+                self.isLoading = false
+            }
+            return .undefined
+        })
     }
     
     private func parseGifs(from data: JSValue) {
         // Assuming data is { data: [ { id: "...", images: { fixed_height: { url: "..." } } } ] }
         var fetchedGifs: [Gif] = []
-        if let dataArray = data["data"].array {
+        if let dataArray = data[dynamicMember: "data"].array {
             for item in dataArray {
-                if let id = item["id"].string,
-                   let images = item["images"].object,
-                   let fixedHeight = images["fixed_height"].object,
-                   let url = fixedHeight["url"].string {
+                if let id = item[dynamicMember: "id"].string,
+                   let images = item[dynamicMember: "images"].object,
+                   let fixedHeight = images[dynamicMember: "fixed_height"].object,
+                   let url = fixedHeight[dynamicMember: "url"].string {
                     fetchedGifs.append(Gif(id: id, url: url))
                 }
             }
