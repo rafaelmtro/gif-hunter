@@ -9,36 +9,38 @@ This repository is split into two main services:
 
 ### [Frontend (Swift Web)](./frontend/README.md)
 The web application providing the user interface, built using SwiftWasm and Tokamak.
-- Component-based architecture ported from an earlier Flutter design.
-- Asynchronous image loading, declarative state management, and custom themes.
-- Powered by `Carton` for local development and optimized with `wasm-opt`.
+- Component-based architecture with declarative state management.
+- Uses Nginx as a reverse proxy to communicate with the backend.
+- Powered by `Carton` for local development.
 
 ### [Backend (FastAPI)](./backend/README.md)
 A Python FastAPI application acting as a proxy to the Giphy API.
-- Securely stores the `GIPHY_API_KEY`.
+- Securely handles Giphy API authentication.
 - Exposes clean endpoints for trending GIFs, search, and trending tags.
-- Tested thoroughly with `pytest`.
+- Fully tested with `pytest`.
 
 ## Core Technologies
-- **Frontend**: Swift 5.9+, SwiftWasm, Tokamak (Web), Carton.
-- **Backend**: Python 3.11+, FastAPI, HTTPX, Pytest.
-- **Containerization**: Docker & Docker Compose.
-- **CI/CD**: GitHub Actions.
+- **Frontend**: Swift (SwiftWasm), Tokamak, Nginx.
+- **Backend**: Python (FastAPI), HTTPX.
+- **Infrastructure**: Docker & Docker Compose.
 
 ## Building and Running (Docker Compose)
 
 The easiest way to run the entire stack is with Docker Compose.
 
-1. Create a `.env` file at the root or within the `/backend` and `/frontend` directories containing required environment variables (e.g., `GIPHY_API_KEY`).
+1. Create a `.env` file at the root or within the `/backend` folder and add your Giphy API key:
+```env
+GIPHY_API_KEY=your_key_here
+```
 2. Run Docker Compose:
 
 ```bash
 docker-compose up --build
 ```
 
-- **Frontend:** Available at `http://localhost:8080`
-- **Backend:** Available at `http://localhost:8000`
-- **API Documentation:** Available at `http://localhost:8000/docs`
+- **Frontend:** Available at `http://localhost:8000`
+- **Backend API:** Available at `http://localhost:8080`
+- **API Documentation:** Available at `http://localhost:8080/docs`
 
 ## Development Conventions
 - **Versioning**: Strict Semantic Versioning.

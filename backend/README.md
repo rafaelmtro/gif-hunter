@@ -52,6 +52,7 @@ pytest
 ```
 
 ## API Endpoints
+- `GET /`: API welcome message.
 - `GET /gifs/trending`: Get trending GIFs.
 - `GET /gifs/search`: Search for GIFs.
 - `GET /trending/searches`: Get trending search terms.

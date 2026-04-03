@@ -2,6 +2,7 @@ import os
 import httpx
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from typing import Optional, List
 from dotenv import load_dotenv
 
@@ -36,6 +37,28 @@ async def proxy_giphy(endpoint: str, params: dict):
             raise HTTPException(status_code=exc.response.status_code, detail=exc.response.text)
         except Exception as exc:
             raise HTTPException(status_code=500, detail=str(exc))
+
+@app.get("/", response_class=HTMLResponse)
+async def root():
+    return """
+    <html>
+        <head>
+            <title>Gif Hunter API</title>
+            <style>
+                body { font-family: sans-serif; background: #000; color: #ff8c00; text-align: center; padding: 50px; }
+                a { color: #fff; text-decoration: none; border: 1px solid #ff8c00; padding: 10px 20px; border-radius: 5px; }
+                a:hover { background: #ff8c00; color: #000; }
+            </style>
+        </head>
+        <body>
+            <h1>Gif Hunter Backend API</h1>
+            <p>This is the proxy service for the Giphy API.</p>
+            <p>The main application is typically available at <a href="http://localhost:8000">localhost:8000</a>.</p>
+            <br/>
+            <a href="/docs">View API Documentation</a>
+        </body>
+    </html>
+    """
 
 @app.get("/gifs/trending")
 async def get_trending(

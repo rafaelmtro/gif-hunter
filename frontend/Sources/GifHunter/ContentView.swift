@@ -24,12 +24,19 @@ struct ContentView: View {
             }
             
             if viewModel.isLoading {
-                Text("Loading...")
+                Text("Loading GIFs...")
                     .foregroundColor(.white)
+                    .padding()
+            } else if viewModel.gifs.isEmpty {
+                Text("No GIFs found. Try a different search!")
+                    .foregroundColor(.gray)
+                    .padding()
             } else {
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]) {
-                    ForEach(viewModel.gifs, id: \.id) { gif in
-                        GifView(url: gif.url)
+                ScrollView {
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]) {
+                        ForEach(viewModel.gifs, id: \.id) { gif in
+                            GifView(url: gif.url)
+                        }
                     }
                 }
             }
@@ -46,7 +53,7 @@ struct GifView: View {
     let url: String
     
     var body: some View {
-        HTML("img", ["src": url, "style": "width: 100%; border-radius: 8px;"])
+        HTML("img", ["src": url, "style": "width: 100%; border-radius: 8px; margin-bottom: 8px;"])
     }
 }
 
@@ -60,12 +67,13 @@ class GifViewModel: ObservableObject {
     @Published var searchQuery: String = ""
     @Published var isLoading: Bool = false
     
-    let backendURL = "http://backend:8000"
+    // Use relative path handled by Nginx proxy
+    let apiPath = "/api"
     
     func fetchTrending() {
         isLoading = true
         let jsFetch = JSObject.global.fetch.function!
-        let url = "\(backendURL)/gifs/trending"
+        let url = "\(apiPath)/gifs/trending"
         
         _ = jsFetch(url).then(JSClosure { args in
             let response = args[0].object!
@@ -92,10 +100,13 @@ class GifViewModel: ObservableObject {
     }
     
     func searchGifs() {
-        guard !searchQuery.isEmpty else { return }
+        guard !searchQuery.isEmpty else { 
+            fetchTrending()
+            return 
+        }
         isLoading = true
         let jsFetch = JSObject.global.fetch.function!
-        let url = "\(backendURL)/gifs/search?q=\(searchQuery)"
+        let url = "\(apiPath)/gifs/search?q=\(searchQuery)"
         
         _ = jsFetch(url).then(JSClosure { args in
             let response = args[0].object!
@@ -122,7 +133,6 @@ class GifViewModel: ObservableObject {
     }
     
     private func parseGifs(from data: JSValue) {
-        // Assuming data is { data: [ { id: "...", images: { fixed_height: { url: "..." } } } ] }
         var fetchedGifs: [Gif] = []
         if let dataArray = data[dynamicMember: "data"].array {
             for item in dataArray {

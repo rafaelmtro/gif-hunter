@@ -3,7 +3,7 @@ services:
     build:
       context: ./backend
     ports:
-      - "8000:8000"
+      - "8080:8000"
     environment:
       - GIPHY_API_KEY=${GIPHY_API_KEY}
     restart: always
@@ -12,7 +12,7 @@ services:
     build:
       context: ./frontend
     ports:
-      - "8080:80"
+      - "8000:80"
     depends_on:
       - backend
     environment:
