@@ -1,12 +1,5 @@
 # Build Stage
-FROM ghcr.io/swiftwasm/swift:5.10-jammy AS builder
-
-# Install Node/NPM and system dependencies for Carton/SwiftWasm
-RUN apt-get update && apt-get install -y \
-    curl gnupg libgtk-3-dev && \
-    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get install -y nodejs && \
-    rm -rf /var/lib/apt/lists/*
+FROM ghcr.io/swiftwasm/carton:0.20.1 AS builder
 
 WORKDIR /app
 COPY Package.swift .
@@ -14,8 +7,9 @@ COPY Package.swift .
 RUN swift package resolve 
 
 COPY . .
-# Use the carton SwiftPM plugin to bundle the release
-RUN swift run carton bundle --release
+# Use the global carton tool to bundle the application
+# This image already contains the necessary SwiftWasm SDKs
+RUN carton bundle
 
 # Runtime Stage
 FROM nginx:alpine

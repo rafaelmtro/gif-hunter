@@ -73,15 +73,19 @@ class GifViewModel: ObservableObject {
         }).then(JSClosure { args in
             let data = args[0]
             self.parseGifs(from: data)
-            DispatchQueue.main.async {
-                self.isLoading = false
+            Task {
+                await MainActor.run {
+                    self.isLoading = false
+                }
             }
             return .undefined
         }).catch(JSClosure { args in
             let error = args[0]
             print("Error fetching trending: \(error)")
-            DispatchQueue.main.async {
-                self.isLoading = false
+            Task {
+                await MainActor.run {
+                    self.isLoading = false
+                }
             }
             return .undefined
         })
@@ -99,15 +103,19 @@ class GifViewModel: ObservableObject {
         }).then(JSClosure { args in
             let data = args[0]
             self.parseGifs(from: data)
-            DispatchQueue.main.async {
-                self.isLoading = false
+            Task {
+                await MainActor.run {
+                    self.isLoading = false
+                }
             }
             return .undefined
         }).catch(JSClosure { args in
             let error = args[0]
             print("Error searching: \(error)")
-            DispatchQueue.main.async {
-                self.isLoading = false
+            Task {
+                await MainActor.run {
+                    self.isLoading = false
+                }
             }
             return .undefined
         })
@@ -126,8 +134,11 @@ class GifViewModel: ObservableObject {
                 }
             }
         }
-        DispatchQueue.main.async {
-            self.gifs = fetchedGifs
+        let stableGifs = fetchedGifs
+        Task {
+            await MainActor.run {
+                self.gifs = stableGifs
+            }
         }
     }
 }
