@@ -1,26 +1,16 @@
 version: '3.8'
 
 services:
-  frontend:
+  web:
     build:
-      context: ./frontend
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    command: npm run dev
-    environment:
-      - NODE_ENV=development
-
-  backend:
-    build:
-      context: ./backend
+      context: .
     ports:
       - "3000:3000"
     volumes:
-      - ./backend:/app
+      - .:/app
       - /app/node_modules
+      - /app/.next
     command: npm run dev
     environment:
       - NODE_ENV=development
+      - GIPHY_API_KEY=${GIPHY_API_KEY}

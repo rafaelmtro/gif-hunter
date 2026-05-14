@@ -1,12 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Header } from './components/Header';
-import { GifGrid } from './components/GifGrid';
-import { Sidebar } from './components/Sidebar';
-import { DetailModal } from './components/DetailModal';
-import { Gif } from './types';
-import { giphyService } from './services/giphy';
+"use client";
 
-function App() {
+import { useState, useEffect, useCallback } from 'react';
+import { Header } from '../components/Header';
+import { GifGrid } from '../components/GifGrid';
+import { Sidebar } from '../components/Sidebar';
+import { DetailModal } from '../components/DetailModal';
+import { Gif } from '../types';
+import { giphyService } from '../services/giphy';
+
+export default function Home() {
   const [gifs, setGifs] = useState<Gif[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [favorites, setFavorites] = useState<Gif[]>([]);
@@ -162,5 +164,3 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: 'white',
   },
 };
-
-export default App;

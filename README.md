@@ -1,13 +1,12 @@
-# 🎯 Gif Hunter v3.0.0
+# 🎯 Gif Hunter v3.1.0
 
-**Gif Hunter** is a high-performance web application for searching, viewing, and sharing animated GIFs. It leverages a React frontend and a Next.js backend API proxy for robust and secure integration with the Giphy API.
+**Gif Hunter** is a high-performance web application for searching, viewing, and sharing animated GIFs. It is built with Next.js, integrating a React frontend and a backend API proxy for robust and secure integration with the Giphy API.
 
 ---
 
 ## 🛠 Tech Stack
 
-- **Frontend:** React (Vite, TypeScript)
-- **Backend:** Next.js (TypeScript)
+- **Framework:** Next.js (React, TypeScript)
 
 ---
 
@@ -27,18 +26,17 @@
    ```
 
 2. **Setup Environment:**
-   Create a `.env` file in the `backend` directory and add your Giphy API Key:
+   Ensure you have a `.env` file in the root directory with your Giphy API Key:
    ```env
    GIPHY_API_KEY=your_api_key_here
    ```
 
-3. **Run the Stack:**
+3. **Run the Application:**
    ```bash
    docker-compose up --build
    ```
 
-- Frontend accessible at `http://localhost:5173`
-- Backend API accessible at `http://localhost:3000`
+- Access the application at `http://localhost:3000`
 
 ---
 
