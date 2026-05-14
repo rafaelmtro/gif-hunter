@@ -1,122 +1,166 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useEffect, useCallback } from 'react';
+import { Header } from './components/Header';
+import { GifGrid } from './components/GifGrid';
+import { Sidebar } from './components/Sidebar';
+import { DetailModal } from './components/DetailModal';
+import { Gif } from './types';
+import { giphyService } from './services/giphy';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [gifs, setGifs] = useState<Gif[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
+  const [favorites, setFavorites] = useState<Gif[]>([]);
+  const [selectedGif, setSelectedGif] = useState<Gif | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFavoritesOnly, setIsFavoritesOnly] = useState(false);
+  const [offset, setOffset] = useState(0);
+  const [query, setQuery] = useState('');
+
+  // Load favorites from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('favorites');
+    if (saved) {
+      setFavorites(JSON.parse(saved));
+    }
+  }, []);
+
+  // Save favorites to localStorage
+  useEffect(() => {
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  }, [favorites]);
+
+  // Fetch initial data
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const res = await giphyService.getTrendingTags();
+        setTags(res.data || []);
+      } catch (e) {
+        console.error('Failed to fetch tags', e);
+      }
+    };
+    fetchTags();
+  }, []);
+
+  const fetchGifs = useCallback(async (searchQuery: string, currentOffset: number, append = false) => {
+    setIsLoading(true);
+    try {
+      let res;
+      if (searchQuery) {
+        res = await giphyService.search(searchQuery, currentOffset);
+      } else {
+        res = await giphyService.getTrending(currentOffset);
+      }
+      
+      if (append) {
+        setGifs(prev => [...prev, ...res.data]);
+      } else {
+        setGifs(res.data);
+      }
+    } catch (e) {
+      console.error('Failed to fetch gifs', e);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isFavoritesOnly) {
+      fetchGifs(query, 0, false);
+      setOffset(0);
+    }
+  }, [query, isFavoritesOnly, fetchGifs]);
+
+  const handleSearch = (q: string) => {
+    setQuery(q);
+    setIsFavoritesOnly(false);
+  };
+
+  const handleTagClick = (tag: string) => {
+    setQuery(tag);
+    setIsFavoritesOnly(false);
+  };
+
+  const toggleFavorite = (gif: Gif) => {
+    setFavorites(prev => {
+      const isFav = prev.find(f => f.id === gif.id);
+      if (isFav) {
+        return prev.filter(f => f.id !== gif.id);
+      } else {
+        return [...prev, gif];
+      }
+    });
+  };
+
+  const handleScroll = useCallback(() => {
+    if (isFavoritesOnly || isLoading) return;
+    
+    if (window.innerHeight + document.documentElement.scrollTop + 100 >= document.documentElement.offsetHeight) {
+      const nextOffset = offset + 20;
+      setOffset(nextOffset);
+      fetchGifs(query, nextOffset, true);
+    }
+  }, [offset, query, isFavoritesOnly, isLoading, fetchGifs]);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+
+  const favoriteIds = favorites.map(f => f.id);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div style={styles.app}>
+      <Header onSearch={handleSearch} />
+      <div style={styles.main}>
+        <div style={styles.content}>
+          <h1 style={styles.title}>
+            {isFavoritesOnly ? 'Your Favorites' : query ? `Search results for "${query}"` : 'Trending GIFs'}
+          </h1>
+          <GifGrid
+            gifs={isFavoritesOnly ? favorites : gifs}
+            onSelect={setSelectedGif}
+            favorites={favoriteIds}
+            onToggleFavorite={toggleFavorite}
+            isLoading={isLoading}
+          />
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        <Sidebar
+          tags={tags}
+          onTagClick={handleTagClick}
+          favoritesCount={favorites.length}
+          onOpenFavorites={() => setIsFavoritesOnly(!isFavoritesOnly)}
+        />
+      </div>
+      <DetailModal
+        gif={selectedGif}
+        onClose={() => setSelectedGif(null)}
+        isFavorite={selectedGif ? favoriteIds.includes(selectedGif.id) : false}
+        onToggleFavorite={toggleFavorite}
+      />
+    </div>
+  );
 }
 
-export default App
+const styles: { [key: string]: React.CSSProperties } = {
+  app: {
+    minHeight: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  main: {
+    display: 'flex',
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    padding: '20px 40px',
+  },
+  title: {
+    fontSize: '24px',
+    margin: '0 0 20px 20px',
+    color: 'white',
+  },
+};
+
+export default App;
