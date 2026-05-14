@@ -1,38 +1,49 @@
 name: GIF Hunter CI
-
 on:
   push:
-    branches: [master, develop]
-  pull_request:
-    branches: [master, develop]
-
+    branches: [master]
+    paths-ignore:
+      - "**/README.md"
+      - "**/LICENSE.md"
+      - "**/Dockerfile"
 jobs:
-  backend-test:
-    name: Backend Tests
+  build:
+    name: GIF Hunter Builder
     runs-on: ubuntu-latest
+    env:
+      my_secret: ${{secrets.GIF_HUNTER_CI}}
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: subosito/flutter-action@v2
         with:
-          python-version: '3.11'
-      - name: Install dependencies
-        working-directory: ./backend
-        run: pip install -r requirements.txt
-      - name: Run Tests
-        working-directory: ./backend
-        run: pytest
-
-  frontend-build:
-    name: Frontend Build (SwiftWasm)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install SwiftWasm and Carton
+          channel: stable
+      - run: flutter config --enable-web
+      - run: flutter pub get
+      - name: Create .env file
         run: |
-          npm install -g @swiftwasm/carton
-      - name: Build Web Assembly
-        working-directory: ./frontend
+          echo "GIPHY_API_KEY=${{ secrets.GIPHY_API_KEY }}" > .env
+      - run: flutter build web
+      - name: Archive Development Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: build/web
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-build
+      - name: Display structure of build files
+        run: ls -R
+        working-directory: ./web
+      - name: GH Pages Deploy
         run: |
-          # Use a Docker image to build the Wasm bundle since we need the SwiftWasm toolchain
-          docker run --rm -v ${{ github.workspace }}/frontend:/app -w /app swiftwasm/swift:5.9-focal bash -c "npm install -g @swiftwasm/carton && carton bundle --release"
+          cd build/web
+          git init
+          git config --global user.email rsoares.monteiro10@gmail.com
+          git config --global user.name rsoares10
+          git status
+          git remote add origin https://${{secrets.GIF_HUNTER_CI}}@github.com/rsoares10-flutter/gif-hunter.git
+          git checkout -b gh-pages
+          git add --all
+          git commit -m "update"
+          git push origin gh-pages -f
